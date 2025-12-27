@@ -16,15 +16,15 @@ import {
     Box
 } from '@mui/material';
 import {
-    House,
-    Users,
-    GraduationCap,
-    FileText,
-    UserCircle,
-    Settings,
-    LogOut,
+    Home as HomeIcon,
+    Group as GroupIcon,
+    ShoppingBag as ShoppingBagIcon,
+    Receipt as ReceiptIcon,
+    Person as PersonIcon,
+    Settings as SettingsIcon,
+    Logout as LogoutIcon,
     Menu as MenuIcon
-} from 'lucide-react';
+} from '@mui/icons-material';
 import { useAppContext } from '../context/AppContext';
 
 function MainLayout({ children, menus }) {
@@ -55,14 +55,14 @@ function MainLayout({ children, menus }) {
     const activeMenu = getActiveMenu();
 
     const defaultMenus = [
-        { title: "Dashboard", icon: <House size={22} />, path: "/" },
-        { title: "Staff", icon: <Users size={22} />, path: "/staff" },
-        { title: "Students", icon: <Users size={22} />, path: "/students" },
-        { title: "Academics", icon: <GraduationCap size={22} />, path: "/academics" },
-        { title: "Results", icon: <FileText size={22} />, path: "/results" },
-        { title: "Profile", icon: <UserCircle size={22} />, path: "/profile" },
-        { title: "Settings", icon: <Settings size={22} />, path: "/settings" },
-        { title: "Log Out", icon: <LogOut size={22} />, action: "logout" }
+        { title: "Dashboard", icon: <HomeIcon />, path: "/" },
+        { title: "Staff", icon: <GroupIcon />, path: "/staff" },
+        { title: "Students", icon: <GroupIcon />, path: "/students" },
+        { title: "Academics", icon: <ShoppingBagIcon />, path: "/academics" },
+        { title: "Results", icon: <ReceiptIcon />, path: "/results" },
+        { title: "Profile", icon: <PersonIcon />, path: "/profile" },
+        { title: "Settings", icon: <SettingsIcon />, path: "/settings" },
+        { title: "Log Out", icon: <LogoutIcon />, action: "logout" }
     ];
 
     const currentMenus = menus || defaultMenus;
@@ -299,14 +299,14 @@ function MainLayout({ children, menus }) {
                 component="main"
                 sx={{
                     flexGrow: 1,
-                    p: 3,
+                    p: 2,
                     width: { md: `calc(100% - 280px)` },
                     mt: { xs: 7, md: 0 }, // Add margin top on mobile for AppBar
                     height: '100vh',
                     overflowY: 'auto'
                 }}
             >
-                <div className="glass-card" style={{ minHeight: '100%', padding: '32px' }}>
+                <div className="glass-card" style={{ minHeight: '100%', padding: '20px' }}>
                     {children}
                 </div>
             </Box>

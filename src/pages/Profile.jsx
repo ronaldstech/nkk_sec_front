@@ -1,234 +1,410 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
-    Button,
-    Dialog,
-    Box,
-    Typography,
-    TextField,
-    Paper,
-    Avatar,
-    Grid,
-    IconButton,
-    Stack,
-    Divider
+    Box, Button, Dialog, Typography, TextField, Paper, Avatar, Grid, IconButton,
+    Stack, Divider, Container, CircularProgress, Fade, InputAdornment, Card, CardContent,
+    Tooltip, useTheme, useMediaQuery
 } from '@mui/material';
 import {
-    Edit as EditIcon,
-    Close as CloseIcon,
-    CameraAlt as CameraIcon,
-    Person as PersonIcon,
-    Phone as PhoneIcon,
-    Email as EmailIcon,
-    Lock as LockIcon,
-    Badge as BadgeIcon,
-    Logout as LogoutIcon
+    Edit, Close, Person, Phone, Email, Badge, Save, VpnKey,
+    VerifiedUser, Info, ArrowForwardIos, PhotoCamera,
 } from '@mui/icons-material';
+import { Lock as LockIcon } from '@mui/icons-material';
 import Toastify from 'toastify-js';
 import "toastify-js/src/toastify.css";
 import { useAppContext } from '../context/AppContext';
 
-// Reusing the API URL convention if needed, though context handles some calls
-const API_URL = "http://localhost/nkk_sec/api/index.php";
+const API_URL = "https://unimarket-mw.com/smis-api/api/index.php";
 
-function Profile() {
-    const { user, setUser, getUser } = useAppContext();
+export default function Profile() {
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const { user, setUser } = useAppContext();
+    const [loading, setLoading] = useState(false);
+    const [open, setOpen] = useState({ user: false, phone: false, email: false, change: false });
 
-    const [open, setOpen] = useState({
-        change: false, // password
-        user: false, // username
-        phone: false,
-        email: false,
-        image: false
-    });
-
-    const handleUpdate = async (event, field, endpoint = API_URL) => {
-        event.preventDefault();
-        const formData = new FormData(event.target);
+    const handleUpdate = async (e, key) => {
+        e.preventDefault();
+        setLoading(true);
+        const formData = new URLSearchParams(new FormData(e.target));
 
         try {
-            const response = await fetch(endpoint, {
+            const res = await fetch(API_URL, {
                 method: 'POST',
-                body: new URLSearchParams(formData),
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formData
             });
-            const text = await response.text();
-            try {
-                const res = JSON.parse(text);
-                if (res.status) {
-                    Toastify({
-                        text: "Updated Successfully!",
-                        backgroundColor: "linear-gradient(135deg, #10b981 0%, #059669 100%)"
-                    }).showToast();
+            const data = await res.json();
 
-                    setOpen(prev => ({ ...prev, [field]: false }));
-                    getUser(); // Refresh user data
-                } else {
-                    Toastify({ text: res.message || "Update Failed", backgroundColor: "#ef4444" }).showToast();
+            if (data.status) {
+                Toastify({ text: "Information sync complete", backgroundColor: "#059669" }).showToast();
+                const updates = {};
+                if (formData.get('username_edit')) updates.username = formData.get('username_edit');
+                if (formData.get('phone_edit')) updates.phone = formData.get('phone_edit');
+                if (formData.get('email_edit')) updates.email = formData.get('email_edit');
+
+                if (Object.keys(updates).length) {
+                    const newUser = { ...user, ...updates };
+                    setUser(newUser);
+                    localStorage.setItem('user', JSON.stringify(newUser));
                 }
-            } catch (e) {
-                console.error(text);
-                Toastify({ text: "Server Error", backgroundColor: "#ef4444" }).showToast();
+                setOpen({ ...open, [key]: false });
+            } else {
+                Toastify({ text: data.message || "Sync failed", backgroundColor: "#dc2626" }).showToast();
             }
-        } catch (error) {
-            Toastify({ text: "Connection Error", backgroundColor: "#ef4444" }).showToast();
+        } catch {
+            Toastify({ text: "Connection error", backgroundColor: "#dc2626" }).showToast();
+        } finally {
+            setLoading(false);
         }
-    }
-
-    const changePassword = (e) => handleUpdate(e, 'change');
-    const changeUsername = (e) => handleUpdate(e, 'user');
-    const changeEmail = (e) => handleUpdate(e, 'email');
-    const changePhone = (e) => handleUpdate(e, 'phone');
-
-    useEffect(() => {
-        getUser();
-    }, []);
-
-    // Reusable styles
-    const cardStyle = {
-        p: 3,
-        borderRadius: 3,
-        border: '1px solid #e2e8f0',
-        background: '#fff',
-        height: '100%'
     };
 
-    const dialogPaperProps = { sx: { borderRadius: 3, width: 450 } };
-
     return (
-        <Box>
-            <Typography variant="h6" sx={{ fontWeight: 700, color: '#1e293b', mb: 3 }}>
-                My Profile
-            </Typography>
-
-            <Grid container spacing={3}>
-                {/* Profile Card */}
-                <Grid item xs={12} md={4}>
-                    <Paper elevation={0} sx={cardStyle}>
-                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-                            <Box sx={{ position: 'relative', mb: 2 }}>
+        <Fade in timeout={800}>
+            <Box sx={{ minHeight: '100vh', bgcolor: '#f8fafc', pb: 10 }}>
+                {/* MODERN TOP BANNER */}
+                <Box sx={{
+                    height: 240,
+                    background: 'linear-gradient(135deg, #385585ff 0%, #91bcf8ff 100%)',
+                    position: 'relative',
+                    mb: { xs: 15, md: 10 },
+                    borderTopLeftRadius: 20,
+                    borderTopRightRadius: 20,
+                }}>
+                    <Container maxWidth="lg" sx={{ height: '100%', position: 'relative' }}>
+                        <Box sx={{
+                            position: 'absolute',
+                            bottom: { xs: -100, md: -60 },
+                            left: { xs: '50%', md: 0 },
+                            transform: { xs: 'translateX(-50%)', md: 'none' },
+                            display: 'flex',
+                            flexDirection: { xs: 'column', md: 'row' },
+                            alignItems: 'center',
+                            gap: 3,
+                            width: '100%'
+                        }}>
+                            <Box sx={{ position: 'relative' }}>
                                 <Avatar
-                                    src="images/pro_file.jpg"
-                                    sx={{ width: 120, height: 120, border: '4px solid #f8fafc' }}
-                                />
-                                <IconButton
-                                    onClick={() => setOpen({ ...open, image: true })}
+                                    src="/images/profile.jpg"
                                     sx={{
-                                        position: 'absolute', bottom: 0, right: 0,
-                                        bgcolor: '#6366f1', color: '#fff',
-                                        '&:hover': { bgcolor: '#4f46e5' }
+                                        width: 160, height: 160,
+                                        border: '6px solid #fff',
+                                        boxShadow: '0 10px 25px rgba(0,0,0,0.1)'
                                     }}
-                                    size="small"
-                                >
-                                    <CameraIcon fontSize="small" />
-                                </IconButton>
+                                />
+                                <Tooltip title="Change Photo">
+                                    <IconButton size="small" sx={{
+                                        position: 'absolute', bottom: 10, right: 10,
+                                        bgcolor: '#fff', boxShadow: 2, '&:hover': { bgcolor: '#f1f5f9' }
+                                    }}>
+                                        <PhotoCamera sx={{ fontSize: 20, color: '#6366f1' }} />
+                                    </IconButton>
+                                </Tooltip>
                             </Box>
-                            <Typography variant="h6" fontWeight={700}>{user.username}</Typography>
-                            <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>{user.role}</Typography>
 
-                            <Button
-                                variant="outlined"
-                                fullWidth
-                                color="error"
-                                startIcon={<LockIcon />}
-                                onClick={() => setOpen({ ...open, change: true })}
-                            >
-                                Change Password
-                            </Button>
+                            <Box sx={{ textAlign: { xs: 'center', md: 'left' }, pt: { md: 5 } }}>
+                                <Typography variant="h4" fontWeight={900} color={isMobile ? "#0f172a" : "#fff"}>
+                                    {user.username}
+                                </Typography>
+                                <Stack direction="row" spacing={1} justifyContent={{ xs: 'center', md: 'flex-start' }} alignItems="center">
+                                    <VerifiedUser sx={{ fontSize: 16, color: '#10b981' }} />
+                                    <Typography variant="body1" sx={{ color: isMobile ? "#64748b" : "#cbd5e1", fontWeight: 500 }}>
+                                        {user.role || 'Staff Member'}
+                                    </Typography>
+                                </Stack>
+                            </Box>
                         </Box>
-                    </Paper>
-                </Grid>
-
-                {/* Details Card */}
-                <Grid item xs={12} md={8}>
-                    <Paper elevation={0} sx={cardStyle}>
-                        <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 3 }}>Personal Information</Typography>
-
-                        <Stack spacing={3}>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                                    <Avatar sx={{ bgcolor: '#eff6ff', color: '#3b82f6' }}><BadgeIcon /></Avatar>
-                                    <Box>
-                                        <Typography variant="caption" color="textSecondary">Username</Typography>
-                                        <Typography variant="body1" fontWeight={500}>{user.username}</Typography>
-                                    </Box>
-                                </Box>
-                                <Button size="small" startIcon={<EditIcon />} onClick={() => setOpen({ ...open, user: true })}>Edit</Button>
-                            </Box>
-                            <Divider />
-
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                                    <Avatar sx={{ bgcolor: '#f0fdf4', color: '#22c55e' }}><PhoneIcon /></Avatar>
-                                    <Box>
-                                        <Typography variant="caption" color="textSecondary">Phone</Typography>
-                                        <Typography variant="body1" fontWeight={500}>{user.phone}</Typography>
-                                    </Box>
-                                </Box>
-                                <Button size="small" startIcon={<EditIcon />} onClick={() => setOpen({ ...open, phone: true })}>Edit</Button>
-                            </Box>
-                            <Divider />
-
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                                    <Avatar sx={{ bgcolor: '#fff7ed', color: '#f97316' }}><EmailIcon /></Avatar>
-                                    <Box>
-                                        <Typography variant="caption" color="textSecondary">Email</Typography>
-                                        <Typography variant="body1" fontWeight={500}>{user.email}</Typography>
-                                    </Box>
-                                </Box>
-                                <Button size="small" startIcon={<EditIcon />} onClick={() => setOpen({ ...open, email: true })}>Edit</Button>
-                            </Box>
-
-                        </Stack>
-                    </Paper>
-                </Grid>
-            </Grid>
-
-            {/* --- DIALOGS --- */}
-
-            {/* Generic Update Dialog Wrapper could be factored out, but keeping inline for simplicity with existing state */}
-            {[
-                { type: 'user', title: 'Change Username', field: 'username_edit', val: user.username, icon: <BadgeIcon />, handler: changeUsername },
-                { type: 'phone', title: 'Change Phone', field: 'phone_edit', val: user.phone, icon: <PhoneIcon />, handler: changePhone },
-                { type: 'email', title: 'Change Email', field: 'email_edit', val: user.email, icon: <EmailIcon />, handler: changeEmail }
-            ].map((d) => (
-                <Dialog key={d.type} open={open[d.type]} onClose={() => setOpen({ ...open, [d.type]: false })} PaperProps={dialogPaperProps}>
-                    <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f1f5f9' }}>
-                        <Typography fontWeight={600}>{d.title}</Typography>
-                        <IconButton size="small" onClick={() => setOpen({ ...open, [d.type]: false })}><CloseIcon /></IconButton>
-                    </Box>
-                    <form onSubmit={d.handler} style={{ padding: 20 }}>
-                        <input type="hidden" name="user_id" value={user.id} />
-                        <TextField
-                            label={d.title.replace('Change ', '')}
-                            name={d.field}
-                            defaultValue={d.val}
-                            fullWidth sx={{ mb: 3 }}
-                        />
-                        <Button type="submit" variant="contained" fullWidth sx={{ borderRadius: 2 }}>Save Changes</Button>
-                    </form>
-                </Dialog>
-            ))}
-
-            {/* Change Password Dialog */}
-            <Dialog open={open.change} onClose={() => setOpen({ ...open, change: false })} PaperProps={dialogPaperProps}>
-                <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f1f5f9' }}>
-                    <Typography fontWeight={600}>Change Password</Typography>
-                    <IconButton size="small" onClick={() => setOpen({ ...open, change: false })}><CloseIcon /></IconButton>
+                    </Container>
                 </Box>
-                <form id="change_password" onSubmit={changePassword} style={{ padding: 20 }}>
-                    <input type="hidden" name="user_id" value={user.id} />
-                    <Stack spacing={2}>
-                        <TextField label="Current Password" name="current_password" type="password" fullWidth required />
-                        <TextField label="New Password" name="new_password" type="password" fullWidth required />
-                        <TextField label="Confirm Password" name="confirm_password" type="password" fullWidth required />
-                    </Stack>
-                    <Button type="submit" variant="contained" color="error" fullWidth sx={{ mt: 3, borderRadius: 2 }}>Update Password</Button>
-                </form>
-            </Dialog>
 
-        </Box>
+                <Container maxWidth="lg">
+                    <Grid container spacing={4}>
+                        {/* LEFT COLUMN: ACCOUNT OVERVIEW */}
+                        <Grid item xs={12} md={8}>
+                            <Typography variant="h6" fontWeight={800} gutterBottom sx={{ color: '#1e293b', mb: 3 }}>
+                                Personal Information
+                            </Typography>
+
+                            <Paper elevation={2} sx={{ borderRadius: 2, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+                                {[
+                                    { label: 'Full Name', value: user.username, icon: <Person />, key: 'user' },
+                                    { label: 'Mobile Contact', value: user.phone || 'None provided', icon: <Phone />, key: 'phone' },
+                                    { label: 'Email Address', value: user.email, icon: <Email />, key: 'email' }
+                                ].map((item, i) => (
+                                    <Box key={item.key}>
+                                        <Box sx={{
+                                            p: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                            '&:hover': { bgcolor: '#f8fafc' }, transition: '0.2s'
+                                        }}>
+                                            <Stack direction="row" spacing={3} alignItems="center">
+                                                <Box sx={{
+                                                    p: 1.5, borderRadius: 2, bgcolor: '#eff6ff', color: '#3b82f6'
+                                                }}>
+                                                    {item.icon}
+                                                </Box>
+                                                <Box>
+                                                    <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 600, textTransform: 'uppercase' }}>
+                                                        {item.label}
+                                                    </Typography>
+                                                    <Typography variant="body1" fontWeight={700} color="#1e293b">
+                                                        {item.value}
+                                                    </Typography>
+                                                </Box>
+                                            </Stack>
+                                            <Button
+                                                onClick={() => setOpen({ ...open, [item.key]: true })}
+                                                variant="text"
+                                                sx={{ color: '#6366f1', fontWeight: 700, borderRadius: 2 }}
+                                            >
+                                                Update
+                                            </Button>
+                                        </Box>
+                                        {i < 2 && <Divider sx={{ mx: 3 }} />}
+                                    </Box>
+                                ))}
+                            </Paper>
+                        </Grid>
+
+                        {/* RIGHT COLUMN: SECURITY & ACTIONS */}
+                        <Grid item xs={12} md={4}>
+                            <Typography variant="h6" fontWeight={800} gutterBottom sx={{ color: '#1e293b', mb: 3 }}>
+                                Security
+                            </Typography>
+
+                            <Card elevation={0} sx={{ borderRadius: 2, border: '1px solid #e2e8f0', bgcolor: '#fff' }}>
+                                <CardContent sx={{ p: 3 }}>
+                                    <Stack spacing={3}>
+                                        <Box>
+                                            <Typography variant="subtitle2" fontWeight={800} color="#0f172a">
+                                                Password Management
+                                            </Typography>
+                                            <Typography variant="body2" color="#64748b" sx={{ mb: 2 }}>
+                                                Last updated: 3 months ago
+                                            </Typography>
+                                            <Button
+                                                fullWidth
+                                                variant="contained"
+                                                disableElevation
+                                                onClick={() => setOpen({ ...open, change: true })}
+                                                sx={{ bgcolor: '#1e293b', py: 1.2, borderRadius: 2.5, '&:hover': { bgcolor: '#000' } }}
+                                                startIcon={<VpnKey />}
+                                            >
+                                                Change Password
+                                            </Button>
+                                        </Box>
+
+                                        <Divider />
+
+                                        <Box sx={{ p: 2, bgcolor: '#fff7ed', borderRadius: 3, border: '1px solid #fed7aa' }}>
+                                            <Stack direction="row" spacing={1.5}>
+                                                <Info sx={{ color: '#ea580c' }} />
+                                                <Typography variant="caption" color="#9a3412" fontWeight={500}>
+                                                    Keep your credentials private. We will never ask for your password via email or phone.
+                                                </Typography>
+                                            </Stack>
+                                        </Box>
+                                    </Stack>
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                    </Grid>
+                </Container>
+
+                {/* DYNAMIC EDIT DIALOGS */}
+                {Object.entries({
+                    user: { label: 'Full Name', field: 'username_edit', val: user.username },
+                    phone: { label: 'Phone Number', field: 'phone_edit', val: user.phone },
+                    email: { label: 'Email Address', field: 'email_edit', val: user.email }
+                }).map(([key, d]) => (
+                    <Dialog
+                        key={key}
+                        open={open[key]}
+                        onClose={() => !loading && setOpen({ ...open, [key]: false })}
+                        PaperProps={{ sx: { borderRadius: 4, width: 400, p: 1 } }}
+                    >
+                        <Box p={3}>
+                            <Typography variant="h6" fontWeight={900} mb={1}>Update {d.label}</Typography>
+                            <Typography variant="body2" color="#64748b" mb={3}>Please ensure the information is correct.</Typography>
+
+                            <form onSubmit={(e) => handleUpdate(e, key)}>
+                                <input type="hidden" name="user_id" value={user.id} />
+                                <TextField
+                                    fullWidth label={d.label} name={d.field}
+                                    defaultValue={d.val} disabled={loading}
+                                    sx={{ mb: 3, '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+                                />
+                                <Button
+                                    type="submit" fullWidth variant="contained"
+                                    disabled={loading} sx={{ py: 1.5, borderRadius: 3, bgcolor: '#6366f1' }}
+                                    startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <Save />}
+                                >
+                                    Confirm Update
+                                </Button>
+                            </form>
+                        </Box>
+                    </Dialog>
+                ))}
+
+                {/* PASSWORD CHANGE DIALOG */}
+                <Dialog
+                    open={open.change}
+                    onClose={() => !loading && setOpen({ ...open, change: false })}
+                    fullWidth
+                    maxWidth="xs"
+                    PaperProps={{
+                        sx: {
+                            borderRadius: 2,
+                            overflow: 'hidden'
+                        }
+                    }}
+                >
+                    {/* Header */}
+                    <Box
+                        sx={{
+                            px: 3,
+                            py: 2.5,
+                            bgcolor: '#fef2f2',
+                            borderBottom: '1px solid #fee2e2',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1.5
+                        }}
+                    >
+                        <Box
+                            sx={{
+                                p: 1,
+                                borderRadius: 2,
+                                bgcolor: '#fee2e2',
+                                color: '#ef4444'
+                            }}
+                        >
+                            <VpnKey fontSize="small" />
+                        </Box>
+
+                        <Box>
+                            <Typography variant="h6" fontWeight={900} color="#7f1d1d">
+                                Security Update
+                            </Typography>
+                            <Typography variant="caption" color="#991b1b">
+                                Change your account password
+                            </Typography>
+                        </Box>
+                    </Box>
+
+                    {/* Body */}
+                    <Box p={3}>
+                        <Typography
+                            variant="body2"
+                            color="#64748b"
+                            mb={3}
+                            sx={{ lineHeight: 1.6 }}
+                        >
+                            Enter your current password and choose a strong new password to
+                            keep your account secure.
+                        </Typography>
+
+                        <form onSubmit={(e) => handleUpdate(e, 'change')}>
+                            <input type="hidden" name="user_id" value={user.id} />
+
+                            <Stack spacing={2.5}>
+                                <TextField
+                                    type="password"
+                                    label="Current Password"
+                                    name="current_password"
+                                    required
+                                    fullWidth
+                                    disabled={loading}
+                                    InputProps={{
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <LockIcon sx={{ color: '#94a3b8' }} />
+                                            </InputAdornment>
+                                        )
+                                    }}
+                                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+                                />
+
+                                <TextField
+                                    type="password"
+                                    label="New Password"
+                                    name="new_password"
+                                    required
+                                    fullWidth
+                                    disabled={loading}
+                                    InputProps={{
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <LockIcon sx={{ color: '#94a3b8' }} />
+                                            </InputAdornment>
+                                        )
+                                    }}
+                                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+                                />
+
+                                <TextField
+                                    type="password"
+                                    label="Confirm New Password"
+                                    name="confirm_password"
+                                    required
+                                    fullWidth
+                                    disabled={loading}
+                                    InputProps={{
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <LockIcon sx={{ color: '#94a3b8' }} />
+                                            </InputAdornment>
+                                        )
+                                    }}
+                                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+                                />
+
+                                <Button
+                                    type="submit"
+                                    fullWidth
+                                    variant="contained"
+                                    color="error"
+                                    disabled={loading}
+                                    startIcon={
+                                        loading
+                                            ? <CircularProgress size={20} color="inherit" />
+                                            : <VpnKey />
+                                    }
+                                    sx={{
+                                        py: 1.5,
+                                        borderRadius: 3,
+                                        fontWeight: 800,
+                                        mt: 1,
+                                        boxShadow: '0 10px 20px -5px rgba(239,68,68,0.35)',
+                                        '&:hover': {
+                                            boxShadow: '0 14px 25px -5px rgba(239,68,68,0.45)'
+                                        }
+                                    }}
+                                >
+                                    {loading ? 'Updating Password...' : 'Update Password'}
+                                </Button>
+                            </Stack>
+                        </form>
+
+                        {/* Footer note */}
+                        <Box
+                            mt={3}
+                            sx={{
+                                p: 2,
+                                bgcolor: '#fff7ed',
+                                borderRadius: 3,
+                                border: '1px solid #fed7aa'
+                            }}
+                        >
+                            <Stack direction="row" spacing={1.5} alignItems="flex-start">
+                                <Info sx={{ color: '#ea580c', mt: '2px' }} />
+                                <Typography variant="caption" color="#9a3412" fontWeight={600}>
+                                    For your safety, never reuse passwords from other platforms.
+                                </Typography>
+                            </Stack>
+                        </Box>
+                    </Box>
+                </Dialog>
+
+            </Box>
+        </Fade>
     );
 }
-
-export default Profile;

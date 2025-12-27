@@ -1,346 +1,243 @@
 import React, { useState, useEffect } from 'react';
 import {
-    Button,
-    Dialog,
-    Box,
-    Typography,
-    Table,
-    TableHead,
-    TableRow,
-    TableCell,
-    TableBody,
-    Drawer,
-    Checkbox,
-    FormGroup,
-    FormControlLabel,
-    Stack,
-    Alert,
-    Paper,
-    TableContainer,
-    IconButton,
-    Chip,
-    Avatar,
-    Menu,
-    MenuItem
+    Box, Typography, Table, TableHead, TableRow, TableCell,
+    TableBody, Stack, Paper, TableContainer, IconButton, Chip, Avatar, Tooltip, LinearProgress
 } from '@mui/material';
 import {
-    Close as CloseIcon,
-    Settings as SettingsIcon,
-    AddCircle as AddIcon,
-    Delete as DeleteIcon,
-    ArrowDropDown as ArrowDropDownIcon
+    Settings as SettingsIcon, School as SchoolIcon
 } from '@mui/icons-material';
 import Toastify from 'toastify-js';
 import "toastify-js/src/toastify.css";
+
+import TeacherManagementDrawer from './components/TeacherManagementDrawer';
+import AssignSubjectDialog from './components/AssignSubjectDialog';
 
 const API_URL = "https://unimarket-mw.com/smis-api/api/index.php";
 
 function SubjectTeachers() {
     const [rows, setRows] = useState([]);
-    const [academic, setAcademic] = useState({
-        id: 0,
-        name: "Loading...",
-        term: ""
-    });
-
-    const [open, setOpen] = useState({
-        add: false,
-        addsub: false
-    });
-
+    const [academic, setAcademic] = useState({ id: 0, name: "Loading...", term: "" });
+    const [open, setOpen] = useState({ add: false, addsub: false });
     const [manage, setManage] = useState({});
     const [subs, setSubs] = useState([]);
     const [subt, setSubt] = useState([]);
     const [form, setForm] = useState(0);
-
-    /* --- Form Dropdown State --- */
-    const [anchorEl, setAnchorEl] = useState(null);
-    const formMenuOpen = Boolean(anchorEl);
+    const [loading, setLoading] = useState(false);
+    const [subtLoading, setSubtLoading] = useState(false);
 
     /* ================= DATA FETCHING ================= */
     const getAcademic = async () => {
-        try {
-            const res = await fetch(`${API_URL}?getAcademic=true`);
-            const data = await res.json();
-            setAcademic(data);
-        } catch (error) {
-            console.error("Error fetching academic:", error);
-        }
+        const res = await fetch(`${API_URL}?getAcademic=true`);
+        const data = await res.json();
+        setAcademic(data);
     };
 
     const getStaff = async () => {
         if (!academic.id) return;
+        setLoading(true);
         try {
-            // Updated API param to match context
             const res = await fetch(`${API_URL}?getStaffA=${academic.id}`);
             const data = await res.json();
             setRows(data);
         } catch (error) {
             console.error("Error fetching staff:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
     const getSubs = async () => {
-        try {
-            const res = await fetch(`${API_URL}?getSubs=true`);
-            const data = await res.json();
-            setSubs(data);
-        } catch (error) {
-            console.error("Error fetching subjects:", error);
-        }
+        const res = await fetch(`${API_URL}?getSubs=true`);
+        const data = await res.json();
+        setSubs(data);
     };
 
     const getSubt = async (teacherId, academicId) => {
+        setSubtLoading(true);
         try {
             const res = await fetch(`${API_URL}?getSubt=true&academic_id=${academicId}&teacher_id=${teacherId}`);
             const data = await res.json();
             setSubt(data);
         } catch (error) {
             console.error("Error fetching teacher subjects:", error);
+        } finally {
+            setSubtLoading(false);
         }
     };
 
     /* ================= ACTIONS ================= */
     const select_subject = async (subj) => {
         const body = new URLSearchParams({
-            teacher_id: manage.id,
-            subject_id: subj.id,
-            form: form,
-            academic_id: academic.id
+            teacher_id: manage.id, subject_id: subj.id,
+            form: form, academic_id: academic.id
         });
-
-        try {
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                body: body,
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-            });
-            const res = await response.json();
-            Toastify({ text: res.message, backgroundColor: "#4f46e5" }).showToast();
-            getSubt(manage.id, academic.id);
-            getStaff(); // Refresh counts
-        } catch (error) {
-            Toastify({ text: "Error assigning subject", backgroundColor: "#ef4444" }).showToast();
-        }
+        const response = await fetch(API_URL, { method: 'POST', body: body });
+        const res = await response.json();
+        Toastify({ text: res.message, backgroundColor: "#4f46e5" }).showToast();
+        getSubt(manage.id, academic.id);
+        getStaff();
     }
 
     const handleDelete = async (id) => {
-        try {
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                body: new URLSearchParams({ deleteSubt: "true", id: id }),
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-            });
-            const res = await response.json();
-            if (res.status) {
-                Toastify({ text: res.message, backgroundColor: "#10b981" }).showToast();
-                getSubt(manage.id, academic.id);
-                getStaff();
-            } else {
-                Toastify({ text: res.message, backgroundColor: "#ef4444" }).showToast();
-            }
-        } catch (error) {
-            Toastify({ text: "Error deletion failed", backgroundColor: "#ef4444" }).showToast();
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            body: new URLSearchParams({ deleteSubt: "true", id: id })
+        });
+        const res = await response.json();
+        if (res.status) {
+            Toastify({ text: res.message, backgroundColor: "#ef4444" }).showToast();
+            getSubt(manage.id, academic.id);
+            getStaff();
         }
     }
 
-    /* ================= EFFECTS ================= */
-    useEffect(() => {
-        getAcademic();
-    }, []);
+    // Handler to open the assign dialog (passed to drawer)
+    const handleAssignNew = (selectedForm) => {
+        setForm(selectedForm);
+        setOpen({ ...open, addsub: true });
+        getSubs();
+    };
 
-    useEffect(() => {
-        getStaff();
-    }, [academic]);
+    useEffect(() => { getAcademic(); }, []);
+    useEffect(() => { getStaff(); }, [academic]);
 
     return (
         <Box>
-            <Box sx={{ mb: 3 }}>
-                <Typography variant="h6" sx={{ fontWeight: 700, color: '#1e293b' }}>
-                    Subject Allocations
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                    Current Academic Year: {academic.name} ({academic.term})
-                </Typography>
+            {/* Header Section */}
+            <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                <Box>
+                    <Typography variant="h5" sx={{ fontWeight: 800, color: '#0f172a', letterSpacing: '-0.5px' }}>
+                        Teacher Allocations
+                    </Typography>
+                    <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 0.5 }}>
+                        <SchoolIcon sx={{ fontSize: 16, color: '#6366f1' }} />
+                        <Typography variant="body2" sx={{ color: '#64748b', fontWeight: 500 }}>
+                            {academic.name} — Term {academic.term}
+                        </Typography>
+                    </Stack>
+                </Box>
+                <Chip
+                    label="Active Session"
+                    size="small"
+                    sx={{ bgcolor: '#ecfdf5', color: '#059669', fontWeight: 700, borderRadius: '6px' }}
+                />
             </Box>
 
-            <Paper elevation={0} sx={{ borderRadius: 2, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-                <TableContainer>
-                    <Table>
-                        <TableHead>
-                            <TableRow sx={{ bgcolor: '#f8fafc' }}>
-                                <TableCell>#</TableCell>
-                                <TableCell>Teacher</TableCell>
-                                <TableCell>Workload</TableCell>
-                                <TableCell>Assigned Subjects</TableCell>
-                                <TableCell align="right">Actions</TableCell>
+            <TableContainer component={Paper} elevation={0} sx={{ borderRadius: 2, border: '1px solid #e2e8f0' }}>
+                <Table>
+                    <TableHead>
+                        <TableRow sx={{ bgcolor: '#f8fafc' }}>
+                            <TableCell sx={{ fontWeight: 700, color: '#475569' }}>Teacher</TableCell>
+                            <TableCell sx={{ fontWeight: 700, color: '#475569' }}>Workload</TableCell>
+                            <TableCell sx={{ fontWeight: 700, color: '#475569' }}>Subjects</TableCell>
+                            <TableCell align="right" sx={{ fontWeight: 700, color: '#475569' }}>Actions</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {loading ? (
+                            <TableRow>
+                                <TableCell colSpan={4} sx={{ p: 0 }}>
+                                    <LinearProgress sx={{ bgcolor: '#e0e7ff', '& .MuiLinearProgress-bar': { bgcolor: '#6366f1' } }} />
+                                </TableCell>
                             </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {rows.map((row, index) => (
-                                <TableRow key={index} hover>
-                                    <TableCell sx={{ color: '#64748b' }}>{index + 1}</TableCell>
-                                    <TableCell sx={{ fontWeight: 600 }}>
+                        ) : (
+                            rows.map((row, index) => (
+                                <TableRow key={index} hover sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                                    <TableCell>
                                         <Stack direction="row" alignItems="center" spacing={2}>
-                                            <Avatar src="images/pro_file.jpg" sx={{ width: 30, height: 30 }} />
-                                            <Typography variant="body2" fontWeight={600}>{row.username}</Typography>
+                                            <Avatar
+                                                sx={{
+                                                    width: 40, height: 40,
+                                                    bgcolor: '#f1f5f9', color: '#6366f1',
+                                                    fontSize: '1rem', fontWeight: 700,
+                                                    border: '2px solid #fff',
+                                                    boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+                                                }}
+                                            >
+                                                {row.username.charAt(0)}
+                                            </Avatar>
+                                            <Box>
+                                                <Typography variant="body2" sx={{ fontWeight: 700, color: '#1e293b' }}>
+                                                    {row.username}
+                                                </Typography>
+                                                <Typography variant="caption" sx={{ color: '#94a3b8' }}>
+                                                    Staff ID: #00{row.id}
+                                                </Typography>
+                                            </Box>
                                         </Stack>
                                     </TableCell>
-                                    <TableCell>
-                                        <Chip label={`${row.subject_count} Subjects`} size="small" color={row.subject_count > 0 ? "primary" : "default"} variant="outlined" />
+                                    <TableCell sx={{ minWidth: 150 }}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <Box sx={{ width: '100%', mr: 1 }}>
+                                                <LinearProgress
+                                                    variant="determinate"
+                                                    value={Math.min((row.subject_count / 8) * 100, 100)}
+                                                    sx={{
+                                                        height: 6, borderRadius: 5, bgcolor: '#f1f5f9',
+                                                        '& .MuiLinearProgress-bar': { borderRadius: 5, bgcolor: row.subject_count > 6 ? '#f59e0b' : '#6366f1' }
+                                                    }}
+                                                />
+                                            </Box>
+                                            <Typography variant="caption" fontWeight={700} color="textSecondary">
+                                                {row.subject_count}
+                                            </Typography>
+                                        </Box>
                                     </TableCell>
-                                    <TableCell sx={{ color: '#64748b' }}>
-                                        {row.subjects && row.subjects.length > 0 ? row.subjects.join(", ") : "None"}
+                                    <TableCell>
+                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                            {row.subjects && row.subjects.length > 0 ? (
+                                                row.subjects.map((s, i) => (
+                                                    <Chip
+                                                        key={s.id || i}
+                                                        label={s.name}
+                                                        size="small"
+                                                        sx={{ fontSize: '0.65rem', height: 20, bgcolor: '#f8fafc', border: '1px solid #e2e8f0' }}
+                                                    />
+                                                ))
+                                            ) : (
+                                                <Typography variant="caption" italic color="#cbd5e1">No assignments</Typography>
+                                            )}
+                                        </Box>
                                     </TableCell>
                                     <TableCell align="right">
-                                        <Button
-                                            variant="outlined"
-                                            size="small"
-                                            startIcon={<SettingsIcon />}
-                                            onClick={() => {
-                                                setManage(row);
-                                                setOpen({ ...open, add: true });
-                                                getSubt(row.id, academic.id);
-                                            }}
-                                            sx={{ borderRadius: 2, textTransform: 'none' }}
-                                        >
-                                            Manage
-                                        </Button>
+                                        <Tooltip title="Manage Schedule">
+                                            <IconButton
+                                                onClick={() => {
+                                                    setManage(row);
+                                                    setOpen({ ...open, add: true });
+                                                    getSubt(row.id, academic.id);
+                                                }}
+                                                sx={{ color: '#6366f1', bgcolor: '#f5f3ff', '&:hover': { bgcolor: '#e0e7ff' } }}
+                                            >
+                                                <SettingsIcon fontSize="small" />
+                                            </IconButton>
+                                        </Tooltip>
                                     </TableCell>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            </Paper>
+                            ))
+                        )}
+                    </TableBody>
+                </Table>
+            </TableContainer>
 
-            {/* SUBJECT MANAGEMENT DRAWER */}
-            <Drawer
-                anchor="right"
+            <TeacherManagementDrawer
                 open={open.add}
                 onClose={() => setOpen({ ...open, add: false })}
-                PaperProps={{ sx: { width: { xs: '100%', sm: 600 } } }}
-            >
-                <Box sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f1f5f9' }}>
-                    <Box>
-                        <Typography variant="h6" fontWeight={700}>Manage Subjects</Typography>
-                        <Typography variant="caption" color="textSecondary">Teacher: {manage.username}</Typography>
-                    </Box>
-                    <IconButton onClick={() => setOpen({ ...open, add: false })}><CloseIcon /></IconButton>
-                </Box>
+                teacher={manage}
+                subjects={subt}
+                loading={subtLoading}
+                onDelete={handleDelete}
+                onAssignNew={handleAssignNew}
+            />
 
-                <Box sx={{ p: 3 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                        <Button
-                            variant="contained"
-                            endIcon={<ArrowDropDownIcon />}
-                            onClick={(e) => setAnchorEl(e.currentTarget)}
-                            sx={{
-                                textTransform: 'none',
-                                background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)'
-                            }}
-                        >
-                            Assign New Subject
-                        </Button>
-                        <Menu
-                            anchorEl={anchorEl}
-                            open={formMenuOpen}
-                            onClose={() => setAnchorEl(null)}
-                        >
-                            {[1, 2, 3, 4].map((f) => (
-                                <MenuItem
-                                    key={f}
-                                    onClick={() => {
-                                        setForm(f);
-                                        setAnchorEl(null);
-                                        setOpen({ ...open, addsub: true });
-                                        getSubs();
-                                    }}
-                                >
-                                    Form {f}
-                                </MenuItem>
-                            ))}
-                        </Menu>
-                    </Box>
-
-                    <TableContainer component={Paper} variant="outlined" sx={{ borderRadius: 2 }}>
-                        <Table size="small">
-                            <TableHead sx={{ bgcolor: '#f8fafc' }}>
-                                <TableRow>
-                                    <TableCell>Subject</TableCell>
-                                    <TableCell>Form</TableCell>
-                                    <TableCell align="right">Remove</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {subt.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell colSpan={3} align="center" sx={{ py: 4, color: '#94a3b8' }}>No subjects assigned yet.</TableCell>
-                                    </TableRow>
-                                ) : (
-                                    subt.map((row, index) => (
-                                        <TableRow key={index}>
-                                            <TableCell sx={{ fontWeight: 600 }}>{row.subject_data?.name || "Unknown"}</TableCell>
-                                            <TableCell><Chip label={`Form ${row.form}`} size="small" /></TableCell>
-                                            <TableCell align="right">
-                                                <IconButton size="small" color="error" onClick={() => handleDelete(row.id)}>
-                                                    <DeleteIcon fontSize="small" />
-                                                </IconButton>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))
-                                )}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                </Box>
-            </Drawer>
-
-            {/* ADD SUBJECT DIALOG */}
-            <Dialog
+            <AssignSubjectDialog
                 open={open.addsub}
                 onClose={() => setOpen({ ...open, addsub: false })}
-                PaperProps={{ sx: { borderRadius: 3, width: 400 } }}
-            >
-                <Box sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f1f5f9' }}>
-                    <Typography variant="h6" fontWeight={700}>Assign Form {form} Subjects</Typography>
-                    <IconButton onClick={() => setOpen({ ...open, addsub: false })} size="small"><CloseIcon /></IconButton>
-                </Box>
-
-                <Box sx={{ p: 0, maxHeight: 400, overflowY: 'auto' }}>
-                    {subs.map((row, index) => (
-                        <Box key={index} sx={{ px: 3, py: 1, borderBottom: '1px solid #f1f5f9' }}>
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        onChange={() => select_subject(row)}
-                                        color="primary"
-                                    />
-                                }
-                                label={row.name}
-                            />
-                        </Box>
-                    ))}
-                </Box>
-
-                <Box sx={{ p: 3, bgcolor: '#f8fafc' }}>
-                    <Button
-                        fullWidth
-                        variant="contained"
-                        onClick={() => {
-                            setOpen({ ...open, addsub: false });
-                            getSubt(manage.id, academic.id);
-                            getStaff();
-                        }}
-                        sx={{ background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)' }}
-                    >
-                        Done
-                    </Button>
-                    <Alert severity="info" sx={{ mt: 2, fontSize: 12 }}>
-                        Checking a box instantly assigns the subject. Unchecking does NOT remove it (use delete in the main list).
-                    </Alert>
-                </Box>
-            </Dialog>
+                form={form}
+                subjects={subs}
+                onSelect={select_subject}
+                onSave={() => { setOpen({ ...open, addsub: false }); getStaff(); }}
+            />
         </Box>
     );
 }
