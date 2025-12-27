@@ -109,6 +109,7 @@ const StudentAddDialog = ({ open, onClose, onSave }) => {
                             startAdornment: <InputAdornment position="start"><PersonIcon fontSize="small" sx={{ color: '#94a3b8' }} /></InputAdornment>
                         }}
                     />
+                    <input type="hidden" name="school" value="day" />
 
                     <FormControl fullWidth sx={{ mb: 3 }}>
                         <InputLabel id="form">Form</InputLabel>
