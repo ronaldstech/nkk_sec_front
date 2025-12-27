@@ -16,15 +16,15 @@ import {
     Box
 } from '@mui/material';
 import {
-    Home as HomeIcon,
-    Group as GroupIcon,
-    ShoppingBag as ShoppingBagIcon,
-    Receipt as ReceiptIcon,
-    Person as PersonIcon,
-    Settings as SettingsIcon,
-    Logout as LogoutIcon,
+    House,
+    Users,
+    GraduationCap,
+    FileText,
+    UserCircle,
+    Settings,
+    LogOut,
     Menu as MenuIcon
-} from '@mui/icons-material';
+} from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 
 function MainLayout({ children, menus }) {
@@ -55,14 +55,14 @@ function MainLayout({ children, menus }) {
     const activeMenu = getActiveMenu();
 
     const defaultMenus = [
-        { title: "Dashboard", icon: <HomeIcon />, path: "/" },
-        { title: "Staff", icon: <GroupIcon />, path: "/staff" },
-        { title: "Students", icon: <GroupIcon />, path: "/students" },
-        { title: "Academics", icon: <ShoppingBagIcon />, path: "/academics" },
-        { title: "Results", icon: <ReceiptIcon />, path: "/results" },
-        { title: "Profile", icon: <PersonIcon />, path: "/profile" },
-        { title: "Settings", icon: <SettingsIcon />, path: "/settings" },
-        { title: "Log Out", icon: <LogoutIcon />, action: "logout" }
+        { title: "Dashboard", icon: <House size={22} />, path: "/" },
+        { title: "Staff", icon: <Users size={22} />, path: "/staff" },
+        { title: "Students", icon: <Users size={22} />, path: "/students" },
+        { title: "Academics", icon: <GraduationCap size={22} />, path: "/academics" },
+        { title: "Results", icon: <FileText size={22} />, path: "/results" },
+        { title: "Profile", icon: <UserCircle size={22} />, path: "/profile" },
+        { title: "Settings", icon: <Settings size={22} />, path: "/settings" },
+        { title: "Log Out", icon: <LogOut size={22} />, action: "logout" }
     ];
 
     const currentMenus = menus || defaultMenus;
