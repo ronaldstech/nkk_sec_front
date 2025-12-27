@@ -66,7 +66,7 @@ function Login() {
             });
 
             // Redirect
-            navigate(data.admin ? "/admin" : "/");
+            navigate(data.admin ? "/" : "/portal/staff");
 
         } catch (err) {
             setError("Unable to connect to server");

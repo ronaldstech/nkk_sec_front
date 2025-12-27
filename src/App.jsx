@@ -203,6 +203,7 @@ function App() {
                 <MainLayout menus={adminMenus}>
                   <Routes>
                     <Route path="/" element={<Dashboard />} />
+                    <Route path="/admin" element={<Navigate to="/" replace />} />
                     <Route path="/dashboard" element={<Navigate to="/" replace />} />
                     <Route path="/staff" element={<StaffAdmin />} />
                     <Route path="/students" element={<StudentsAdmin />} />
