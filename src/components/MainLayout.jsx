@@ -28,7 +28,7 @@ import {
 import { useAppContext } from '../context/AppContext';
 
 function MainLayout({ children, menus }) {
-    const { user, academic } = useAppContext();
+    const { user, academic, logout } = useAppContext();
     const navigate = useNavigate();
     const location = useLocation();
     const theme = useTheme();
@@ -69,7 +69,8 @@ function MainLayout({ children, menus }) {
 
     const handleNavigation = (menu) => {
         if (menu.action === 'logout') {
-            window.open("../kkss_open/login.php");
+            logout();
+            navigate('/login');
         } else {
             navigate(menu.path);
             if (isMobile) {
