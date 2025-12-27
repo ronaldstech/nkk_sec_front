@@ -32,7 +32,7 @@ import Toastify from 'toastify-js';
 import "toastify-js/src/toastify.css";
 import { AppContext } from '../../context/AppContext';
 
-const API_URL = "http://localhost/nkk_sec/api/index.php";
+const API_URL = "https://unimarket-mw.com/smis-api/api/index.php";
 
 function Grading() {
     const [open, setOpen] = useState({

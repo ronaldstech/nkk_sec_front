@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import { Settings as SettingsIcon } from '@mui/icons-material';
 
-const API_URL = "http://localhost/nkk_sec/api/index.php";
+const API_URL = "https://unimarket-mw.com/smis-api/api/index.php";
 
 function System() {
     const [info, setInfo] = useState({

@@ -23,7 +23,7 @@ import StaffTable from './components/StaffTable';
 import StaffAddDialog from './components/StaffAddDialog';
 import StaffEditDrawer from './components/StaffEditDrawer';
 
-const API_URL = "http://localhost/nkk_sec/api/index.php";
+const API_URL = "https://unimarket-mw.com/smis-api/api/index.php";
 
 /* =======================
    STAT CARD COMPONENT

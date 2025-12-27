@@ -23,7 +23,7 @@ import StudentAddDialog from './components/StudentAddDialog';
 import StudentEditDrawer from './components/StudentEditDrawer';
 import StudentDeleteDialog from './components/StudentDeleteDialog';
 
-const API_URL = "http://localhost/nkk_sec/api/index.php";
+const API_URL = "https://unimarket-mw.com/smis-api/api/index.php";
 
 /* =======================
    STAT CARD COMPONENT
