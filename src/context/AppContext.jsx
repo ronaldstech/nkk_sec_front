@@ -23,6 +23,40 @@ export const AppProvider = ({ children }) => {
         };
     });
 
+    const [academic, setAcademic] = useState({
+        id: 0,
+        name: "Academic Name"
+    });
+
+    const getUser = async () => {
+        try {
+            const response = await fetch(`${API_URL}?getUser=true`);
+            if (response.ok) {
+                const res = await response.json();
+                if (res) {
+                    setUser(res);
+                }
+            }
+        } catch (error) {
+            console.error("Failed to fetch user:", error);
+        }
+    }
+
+    const getAcademic = async () => {
+        try {
+            const response = await fetch(`${API_URL}?getAcademic=true`);
+            if (response.ok) {
+                const res = await response.json();
+                if (res) {
+                    setAcademic(res);
+                }
+                console.log(res);
+            }
+        } catch (error) {
+            console.error("Failed to fetch academic data:", error);
+        }
+    }
+
     const login = (userData) => {
         setIsAuthenticated(true);
         const newUser = { ...user, ...userData, username: userData.username || "User" };
