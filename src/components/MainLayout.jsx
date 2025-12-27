@@ -94,11 +94,11 @@ function MainLayout({ children, menus }) {
             }}>
                 <div style={{ position: 'relative', display: 'inline-block' }}>
                     <img
-                        src="images/jac.jpg"
+                        src="images/profile.jpg"
                         className="w3-circle"
                         style={{
-                            width: "95px",
-                            height: "95px",
+                            width: "105px",
+                            height: "105px",
                             objectFit: "cover",
                             border: "4px solid white",
                             boxShadow: "0 10px 20px rgba(0,0,0,0.1)"

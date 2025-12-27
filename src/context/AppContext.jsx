@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 
 export const AppContext = createContext({});
-const API_URL = "http://localhost/nkk_sec/api/index.php";
+const API_URL = "https://unimarket-mw.com/smis-api/api/index.php";
 
 export const AppProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(() => {
