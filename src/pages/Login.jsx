@@ -22,7 +22,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 
-const API_URL = "http://localhost/nkk_sec/api/index.php";
+const API_URL = "https://unimarket-mw.com/smis-api/api/index.php";
 
 function Login() {
     const navigate = useNavigate();
