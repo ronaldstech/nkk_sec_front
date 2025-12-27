@@ -117,7 +117,7 @@ function Login() {
                     </Box>
 
                     <Typography variant="h5" fontWeight={800}>
-                        Staff Login
+                        Hello, Staff Login
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                         Access your dashboard
