@@ -56,8 +56,7 @@ function Login() {
 
             const response = await fetch(API_URL, {
                 method: "POST",
-                body: formData,
-                credentials: 'include'
+                body: formData
             });
 
             const data = await response.json();

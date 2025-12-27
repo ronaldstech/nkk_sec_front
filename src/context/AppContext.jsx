@@ -88,7 +88,7 @@ export const AppProvider = ({ children }) => {
     useEffect(() => {
         // If logged in, fetch fresh data to sync with server
         if (isAuthenticated) {
-            getUser();
+            // getUser(); // Disabled because session cookies aren't shared cross-origin
             getAcademic();
         }
     }, [isAuthenticated]);
