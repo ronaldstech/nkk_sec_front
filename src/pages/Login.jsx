@@ -26,7 +26,17 @@ const API_URL = "https://unimarket-mw.com/smis-api/api/index.php";
 
 function Login() {
     const navigate = useNavigate();
-    const { login } = useAppContext();
+    const { login, isAuthenticated, user } = useAppContext();
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            // Check for admin/staff role mapping
+            // Note: isAdmin is from the login payload. If persisted user state doesn't have it, we check structure.
+            // Adjust this logic to match your strict role requirements.
+            const isAdmin = user?.isAdmin || user?.role === 'admin';
+            navigate(isAdmin ? "/" : "/portal/staff");
+        }
+    }, [isAuthenticated, user, navigate]);
 
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
