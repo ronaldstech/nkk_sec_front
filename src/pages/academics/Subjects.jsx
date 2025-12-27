@@ -35,7 +35,7 @@ import {
 import Toastify from 'toastify-js';
 import "toastify-js/src/toastify.css";
 
-const API_URL = "http://localhost/nkk_sec/api/index.php";
+const API_URL = "https://unimarket-mw.com/smis-api/api/index.php";
 
 function Subjects() {
     const [root, setRoot] = useState("");
