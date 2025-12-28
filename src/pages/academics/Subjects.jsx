@@ -23,7 +23,9 @@ import {
     InputAdornment,
     Stack,
     Divider,
-    LinearProgress
+    LinearProgress,
+    useTheme,
+    useMediaQuery
 } from '@mui/material';
 import {
     Add as AddIcon,
@@ -39,6 +41,8 @@ import "toastify-js/src/toastify.css";
 const API_URL = "https://unimarket-mw.com/smis-api/api/index.php";
 
 function Subjects({ readOnly = false }) {
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const [root, setRoot] = useState("");
     const [open, setOpen] = useState({
         add: false,
@@ -129,7 +133,7 @@ function Subjects({ readOnly = false }) {
 
     return (
         <Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: { xs: 2, md: 3 }, px: { xs: 1, md: 0 } }}>
                 <Typography variant="h6" sx={{ fontWeight: 700, color: '#1e293b' }}>
                     All Subjects
                 </Typography>
@@ -139,7 +143,7 @@ function Subjects({ readOnly = false }) {
                         startIcon={<AddIcon />}
                         onClick={() => setOpen({ ...open, add: true })}
                         sx={{
-                            borderRadius: 2,
+                            borderRadius: 1,
                             textTransform: 'none',
                             background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
                             boxShadow: '0 4px 12px rgba(79, 70, 229, 0.3)'
@@ -150,7 +154,7 @@ function Subjects({ readOnly = false }) {
                 )}
             </Box>
 
-            <Paper elevation={0} sx={{ borderRadius: 2, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+            <Paper elevation={0} sx={{ borderRadius: 1, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
                 <TableContainer>
                     <Table>
                         <TableHead>
@@ -158,7 +162,7 @@ function Subjects({ readOnly = false }) {
                                 <TableCell sx={{ fontWeight: 600, color: '#475569' }}>#</TableCell>
                                 <TableCell sx={{ fontWeight: 600, color: '#475569' }}>Subject Name</TableCell>
                                 <TableCell sx={{ fontWeight: 600, color: '#475569' }}>Root Category</TableCell>
-                                <TableCell sx={{ fontWeight: 600, color: '#475569' }}>Status</TableCell>
+                                {!isMobile && <TableCell sx={{ fontWeight: 600, color: '#475569' }}>Status</TableCell>}
                                 {!readOnly && <TableCell sx={{ fontWeight: 600, color: '#475569' }} align="right">Actions</TableCell>}
                             </TableRow>
                         </TableHead>
@@ -192,33 +196,43 @@ function Subjects({ readOnly = false }) {
                                                 }}
                                             />
                                         </TableCell>
-                                        <TableCell>
-                                            <Chip
-                                                label={row.status}
-                                                size="small"
-                                                sx={{
-                                                    textTransform: 'capitalize',
-                                                    fontWeight: 600,
-                                                    bgcolor: row.status === 'active' ? '#dcfce7' : '#fee2e2',
-                                                    color: row.status === 'active' ? '#15803d' : '#b91c1c'
-                                                }}
-                                            />
-                                        </TableCell>
+                                        {!isMobile && (
+                                            <TableCell>
+                                                <Chip
+                                                    label={row.status}
+                                                    size="small"
+                                                    sx={{
+                                                        textTransform: 'capitalize',
+                                                        fontWeight: 600,
+                                                        bgcolor: row.status === 'active' ? '#dcfce7' : '#fee2e2',
+                                                        color: row.status === 'active' ? '#15803d' : '#b91c1c'
+                                                    }}
+                                                />
+                                            </TableCell>
+                                        )}
                                         {!readOnly && (
                                             <TableCell align="right">
                                                 <Button
-                                                    variant="outlined"
                                                     size="small"
-                                                    startIcon={<EditIcon />}
                                                     onClick={() => {
                                                         setEdit(row);
                                                         setOpen({ ...open, edit: true });
                                                     }}
                                                     sx={{
+                                                        color: '#4f46e5',
+                                                        fontWeight: 700,
                                                         textTransform: 'none',
-                                                        borderRadius: 2,
-                                                        color: '#6366f1',
-                                                        borderColor: '#e2e8f0'
+                                                        borderRadius: '10px',
+                                                        px: 2,
+                                                        py: 0.5,
+                                                        backgroundColor: 'rgba(99, 102, 241, 0.08)',
+                                                        border: '1px solid rgba(99, 102, 241, 0.1)',
+                                                        '&:hover': {
+                                                            backgroundColor: 'rgba(99, 102, 241, 0.15)',
+                                                            transform: 'translateY(-1px)',
+                                                            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)'
+                                                        },
+                                                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
                                                     }}
                                                 >
                                                     Edit

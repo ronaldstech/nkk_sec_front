@@ -226,18 +226,18 @@ function StudentsAdmin() {
                 sx={{
                     minHeight: '100vh',
                     backgroundColor: '#f8fafc',
-                    px: { xs: 1, md: 2 },
-                    py: { xs: 1, md: 2 }
+                    px: { xs: 0, md: 2 },
+                    py: { xs: 0, md: 2 }
                 }}
             >
                 {/* ================= HEADER (STICKY) ================= */}
                 <Paper
                     elevation={0}
                     sx={{
-                        position: 'sticky',
+                        position: { xs: 'relative', md: 'sticky' },
                         top: 0,
                         zIndex: 1100,
-                        mb: 4,
+                        mb: { xs: 2, md: 4 },
                         p: { xs: 1, md: 2 },
                         borderRadius: 0,
                         borderBottom: '1px solid #e2e8f0',
@@ -247,7 +247,7 @@ function StudentsAdmin() {
                 >
                     <Stack
                         direction={{ xs: 'column', md: 'row' }}
-                        spacing={2}
+                        spacing={{ xs: 1, md: 2 }}
                         justifyContent="space-between"
                         alignItems={{ xs: 'stretch', md: 'center' }}
                     >
@@ -302,7 +302,7 @@ function StudentsAdmin() {
                 </Paper>
 
                 {/* ================= STATS ================= */}
-                <Grid container spacing={2} sx={{ mb: 4 }}>
+                <Grid container spacing={{ xs: 1, md: 2 }} sx={{ mb: { xs: 2, md: 4 } }}>
                     <Grid item xs={12} sm={4}>
                         <StatCard
                             title="Total Students"

@@ -64,17 +64,17 @@ const StaffEditDrawer = ({ open, onClose, activeStaff, onUpdate, onActivate }) =
 
             {/* Profile Hero Section */}
             <Box sx={{
-                p: 4,
+                p: 2,
                 textAlign: 'center',
                 background: 'linear-gradient(to bottom, #f8fafc, #ffffff)',
                 position: 'relative'
             }}>
                 <Box sx={{ position: 'relative', display: 'inline-block' }}>
                     <Avatar
-                        src={localActive.profile_pic || "images/pro_file.jpg"}
+                        src={localActive.profile_pic || "images/profile.jpg"}
                         sx={{
-                            width: 100,
-                            height: 100,
+                            width: 120,
+                            height: 120,
                             mx: 'auto',
                             mb: 2,
                             border: '4px solid #fff',

@@ -22,7 +22,7 @@ import {
   Class as ClassIcon
 } from '@mui/icons-material';
 import StaffDashboard from './pages/staff_view/StaffDashboard';
-import StaffHome from './pages/staff_view/StaffHome';
+import StaffHome from './pages/staff_view/grading/StaffHome';
 
 // Profile and Logout are shared
 

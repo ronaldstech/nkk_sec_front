@@ -73,7 +73,7 @@ export const AppProvider = ({ children }) => {
             id: 0,
             username: "user",
             email: "user@gmail.com",
-            picture: "pro_file.png",
+            picture: "profile.png",
             role: "",
             phone: "",
             district_data: { name: "" }

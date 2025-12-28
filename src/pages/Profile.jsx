@@ -124,7 +124,7 @@ export default function Profile() {
                                 Personal Information
                             </Typography>
 
-                            <Paper elevation={2} sx={{ borderRadius: 2, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+                            <Paper elevation={2} sx={{ borderRadius: 1, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
                                 {[
                                     { label: 'Full Name', value: user.username, icon: <Person />, key: 'user' },
                                     { label: 'Mobile Contact', value: user.phone || 'None provided', icon: <Phone />, key: 'phone' },
@@ -170,7 +170,7 @@ export default function Profile() {
                                 Security
                             </Typography>
 
-                            <Card elevation={0} sx={{ borderRadius: 2, border: '1px solid #e2e8f0', bgcolor: '#fff' }}>
+                            <Card elevation={0} sx={{ borderRadius: 1, border: '1px solid #e2e8f0', bgcolor: '#fff' }}>
                                 <CardContent sx={{ p: 3 }}>
                                     <Stack spacing={3}>
                                         <Box>
@@ -194,7 +194,7 @@ export default function Profile() {
 
                                         <Divider />
 
-                                        <Box sx={{ p: 2, bgcolor: '#fff7ed', borderRadius: 3, border: '1px solid #fed7aa' }}>
+                                        <Box sx={{ p: 2, bgcolor: '#fff7ed', borderRadius: 1, border: '1px solid #fed7aa' }}>
                                             <Stack direction="row" spacing={1.5}>
                                                 <Info sx={{ color: '#ea580c' }} />
                                                 <Typography variant="caption" color="#9a3412" fontWeight={500}>

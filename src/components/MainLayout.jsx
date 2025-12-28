@@ -246,7 +246,6 @@ function MainLayout({ children, menus }) {
                     position="fixed"
                     sx={{
                         width: '100%',
-                        zIndex: theme.zIndex.drawer + 1,
                         background: 'rgba(255, 255, 255, 0.8)',
                         backdropFilter: 'blur(10px)',
                         boxShadow: 'none',
@@ -285,6 +284,7 @@ function MainLayout({ children, menus }) {
                     }}
                     sx={{
                         display: { xs: 'block', md: 'none' },
+                        zIndex: (theme) => theme.zIndex.drawer + 2,
                         '& .MuiDrawer-paper': { boxSizing: 'border-box', width: 280, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(10px)' },
                     }}
                 >
@@ -321,16 +321,22 @@ function MainLayout({ children, menus }) {
                 component="main"
                 sx={{
                     flexGrow: 1,
-                    p: 2,
+                    p: { xs: 0, md: 2 }, // No padding on mobile
                     width: { md: `calc(100% - 280px)` },
                     mt: { xs: 7, md: 0 }, // Add margin top on mobile for AppBar
                     height: '100vh',
                     overflowY: 'auto'
                 }}
             >
-                <div className="glass-card" style={{ minHeight: '100%', padding: '20px' }}>
+                <Box
+                    className="glass-card"
+                    sx={{
+                        minHeight: '100%',
+                        p: { xs: 1, md: 2.5 } // Minimal padding on mobile
+                    }}
+                >
                     {children}
-                </div>
+                </Box>
             </Box>
         </Box>
     );

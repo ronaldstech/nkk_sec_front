@@ -21,7 +21,9 @@ import {
     IconButton,
     Chip,
     Stack,
-    LinearProgress
+    LinearProgress,
+    useTheme,
+    useMediaQuery
 } from '@mui/material';
 import {
     Add as AddIcon,
@@ -36,6 +38,8 @@ import { AppContext } from '../../context/AppContext';
 const API_URL = "https://unimarket-mw.com/smis-api/api/index.php";
 
 function Grading() {
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const [open, setOpen] = useState({
         add: false,
         edit: false
@@ -126,7 +130,7 @@ function Grading() {
 
     return (
         <Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }} padding={2}>
                 <Typography variant="h6" fontWeight={700}>Grading Scheme</Typography>
                 <Button
                     variant="contained"
@@ -147,8 +151,8 @@ function Grading() {
                                 <TableCell>Level</TableCell>
                                 <TableCell>Range</TableCell>
                                 <TableCell>Grade</TableCell>
-                                <TableCell>Remark</TableCell>
-                                <TableCell>Status</TableCell>
+                                {!isMobile && <TableCell>Remark</TableCell>}
+                                {!isMobile && <TableCell>Status</TableCell>}
                                 <TableCell align="right">Actions</TableCell>
                             </TableRow>
                         </TableHead>
@@ -164,30 +168,49 @@ function Grading() {
                                     <TableCell sx={{ color: '#64748b' }}>{index + 1}</TableCell>
                                     <TableCell sx={{ textTransform: 'capitalize' }}>{row.level}</TableCell>
                                     <TableCell>{row.min_mark} - {row.max_mark}</TableCell>
-                                    <TableCell><Chip label={row.grade} size="small" sx={{ fontWeight: 700, bgcolor: '#f1f5f9' }} /></TableCell>
-                                    <TableCell>{row.remark}</TableCell>
                                     <TableCell>
-                                        <Chip
-                                            label={row.status}
-                                            size="small"
-                                            sx={{
-                                                textTransform: 'capitalize',
-                                                bgcolor: row.status === 'active' ? '#dcfce7' : '#fee2e2',
-                                                color: row.status === 'active' ? '#166534' : '#991b1b'
-                                            }}
-                                        />
+                                        <Chip label={row.grade} size="small" sx={{ fontWeight: 700, bgcolor: '#f137c3ff' }} color="primary" />
                                     </TableCell>
+                                    {!isMobile && (<TableCell>{row.remark}</TableCell>)}
+                                    {!isMobile && (
+                                        <TableCell>
+                                            <Chip
+                                                label={row.status}
+                                                size="small"
+                                                sx={{
+                                                    textTransform: 'capitalize',
+                                                    bgcolor: row.status === 'active' ? '#dcfce7' : '#fee2e2',
+                                                    color: row.status === 'active' ? '#166534' : '#991b1b'
+                                                }}
+                                            />
+                                        </TableCell>
+                                    )}
                                     <TableCell align="right">
-                                        <IconButton
+                                        <Button
                                             size="small"
                                             onClick={() => {
                                                 setEdit(row);
                                                 setOpen({ ...open, edit: true });
                                             }}
-                                            sx={{ color: '#6366f1' }}
+                                            sx={{
+                                                color: '#4f46e5',
+                                                fontWeight: 700,
+                                                textTransform: 'none',
+                                                borderRadius: '10px',
+                                                px: 2,
+                                                py: 0.5,
+                                                backgroundColor: 'rgba(99, 102, 241, 0.08)',
+                                                border: '1px solid rgba(99, 102, 241, 0.1)',
+                                                '&:hover': {
+                                                    backgroundColor: 'rgba(99, 102, 241, 0.15)',
+                                                    transform: 'translateY(-1px)',
+                                                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)'
+                                                },
+                                                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+                                            }}
                                         >
-                                            <EditIcon fontSize="small" />
-                                        </IconButton>
+                                            Edit
+                                        </Button>
                                     </TableCell>
                                 </TableRow>
                             ))}

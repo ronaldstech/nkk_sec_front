@@ -17,7 +17,8 @@ import {
     LinearProgress,
     Chip,
     useTheme,
-    useMediaQuery
+    useMediaQuery,
+    Button
 } from '@mui/material';
 import {
     Edit as EditIcon,
@@ -209,18 +210,29 @@ const StaffTable = ({
                                     {!readOnly && (
                                         <TableCell align="right">
                                             <Tooltip title="Edit staff">
-                                                <IconButton
+                                                <Button
                                                     size="small"
+                                                    startIcon={<EditIcon sx={{ fontSize: '1rem !important' }} />}
                                                     onClick={() => onEditClick(row)}
                                                     sx={{
-                                                        color: '#6366f1',
+                                                        color: '#4f46e5',
+                                                        fontWeight: 700,
+                                                        textTransform: 'none',
+                                                        borderRadius: '10px',
+                                                        px: 2,
+                                                        py: 0.5,
+                                                        backgroundColor: 'rgba(99, 102, 241, 0.08)',
+                                                        border: '1px solid rgba(99, 102, 241, 0.1)',
                                                         '&:hover': {
-                                                            backgroundColor: '#eef2ff'
-                                                        }
+                                                            backgroundColor: 'rgba(99, 102, 241, 0.15)',
+                                                            transform: 'translateY(-1px)',
+                                                            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)'
+                                                        },
+                                                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
                                                     }}
                                                 >
-                                                    <EditIcon fontSize="small" />
-                                                </IconButton>
+                                                    Edit
+                                                </Button>
                                             </Tooltip>
                                         </TableCell>
                                     )}

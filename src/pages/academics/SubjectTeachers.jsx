@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import {
     Box, Typography, Table, TableHead, TableRow, TableCell,
-    TableBody, Stack, Paper, TableContainer, IconButton, Chip, Avatar, Tooltip, LinearProgress
+    TableBody, Stack, Paper, TableContainer, IconButton, Chip, Avatar, Tooltip, LinearProgress,
+    useTheme, useMediaQuery
 } from '@mui/material';
 import {
     Settings as SettingsIcon, School as SchoolIcon
@@ -15,6 +16,8 @@ import AssignSubjectDialog from './components/AssignSubjectDialog';
 const API_URL = "https://unimarket-mw.com/smis-api/api/index.php";
 
 function SubjectTeachers({ readOnly = false }) {
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const [rows, setRows] = useState([]);
     const [academic, setAcademic] = useState({ id: 0, name: "Loading...", term: "" });
     const [open, setOpen] = useState({ add: false, addsub: false });
@@ -104,7 +107,7 @@ function SubjectTeachers({ readOnly = false }) {
     return (
         <Box>
             {/* Header Section */}
-            <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+            <Box sx={{ mb: { xs: 2, md: 4 }, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', px: { xs: 1, md: 0 } }}>
                 <Box>
                     <Typography variant="h5" sx={{ fontWeight: 800, color: '#0f172a', letterSpacing: '-0.5px' }}>
                         Teacher Allocations
@@ -128,7 +131,7 @@ function SubjectTeachers({ readOnly = false }) {
                     <TableHead>
                         <TableRow sx={{ bgcolor: '#f8fafc' }}>
                             <TableCell sx={{ fontWeight: 700, color: '#475569' }}>Teacher</TableCell>
-                            <TableCell sx={{ fontWeight: 700, color: '#475569' }}>Workload</TableCell>
+                            {!isMobile && <TableCell sx={{ fontWeight: 700, color: '#475569' }}>Workload</TableCell>}
                             <TableCell sx={{ fontWeight: 700, color: '#475569' }}>Subjects</TableCell>
                             {!readOnly && <TableCell align="right" sx={{ fontWeight: 700, color: '#475569' }}>Actions</TableCell>}
                         </TableRow>
@@ -145,7 +148,7 @@ function SubjectTeachers({ readOnly = false }) {
                                 <TableRow key={index} hover sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                                     <TableCell>
                                         <Stack direction="row" alignItems="center" spacing={2}>
-                                            <Avatar
+                                            {!isMobile && (<Avatar
                                                 sx={{
                                                     width: 40, height: 40,
                                                     bgcolor: '#f1f5f9', color: '#6366f1',
@@ -155,7 +158,7 @@ function SubjectTeachers({ readOnly = false }) {
                                                 }}
                                             >
                                                 {row.username.charAt(0)}
-                                            </Avatar>
+                                            </Avatar>)}
                                             <Box>
                                                 <Typography variant="body2" sx={{ fontWeight: 700, color: '#1e293b' }}>
                                                     {row.username}
@@ -166,23 +169,25 @@ function SubjectTeachers({ readOnly = false }) {
                                             </Box>
                                         </Stack>
                                     </TableCell>
-                                    <TableCell sx={{ minWidth: 150 }}>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                            <Box sx={{ width: '100%', mr: 1 }}>
-                                                <LinearProgress
-                                                    variant="determinate"
-                                                    value={Math.min((row.subject_count / 8) * 100, 100)}
-                                                    sx={{
-                                                        height: 6, borderRadius: 5, bgcolor: '#f1f5f9',
-                                                        '& .MuiLinearProgress-bar': { borderRadius: 5, bgcolor: row.subject_count > 6 ? '#f59e0b' : '#6366f1' }
-                                                    }}
-                                                />
+                                    {!isMobile && (
+                                        <TableCell sx={{ minWidth: 150 }}>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                <Box sx={{ width: '100%', mr: 1 }}>
+                                                    <LinearProgress
+                                                        variant="determinate"
+                                                        value={Math.min((row.subject_count / 8) * 100, 100)}
+                                                        sx={{
+                                                            height: 6, borderRadius: 5, bgcolor: '#f1f5f9',
+                                                            '& .MuiLinearProgress-bar': { borderRadius: 5, bgcolor: row.subject_count > 6 ? '#f59e0b' : '#6366f1' }
+                                                        }}
+                                                    />
+                                                </Box>
+                                                <Typography variant="caption" fontWeight={700} color="textSecondary">
+                                                    {row.subject_count}
+                                                </Typography>
                                             </Box>
-                                            <Typography variant="caption" fontWeight={700} color="textSecondary">
-                                                {row.subject_count}
-                                            </Typography>
-                                        </Box>
-                                    </TableCell>
+                                        </TableCell>
+                                    )}
                                     <TableCell>
                                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                                             {row.subjects && row.subjects.length > 0 ? (

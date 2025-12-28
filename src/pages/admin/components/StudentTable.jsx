@@ -17,7 +17,8 @@ import {
     Chip,
     InputBase,
     useTheme,
-    useMediaQuery
+    useMediaQuery,
+    Button
 } from '@mui/material';
 import {
     Edit as EditIcon,
@@ -58,7 +59,7 @@ const StudentTable = ({
         <Paper
             elevation={0}
             sx={{
-                borderRadius: 2,
+                borderRadius: 1,
                 border: '1px solid #e2e8f0',
                 overflow: 'hidden'
             }}
@@ -123,10 +124,10 @@ const StudentTable = ({
                             {!isMobile && <TableCell sx={headStyle}>Gender</TableCell>}
                             {!isMobile && <TableCell sx={headStyle}>Reg No</TableCell>}
                             {!isMobile && <TableCell sx={headStyle}>Profile</TableCell>}
-                            {!isMobile && <TableCell sx={headStyle}>Form</TableCell>}
+                            <TableCell sx={headStyle}>Form</TableCell>
                             {!isMobile && <TableCell sx={headStyle}>School</TableCell>}
 
-                            <TableCell sx={headStyle}>Status</TableCell>
+                            {!isMobile && <TableCell sx={headStyle}>Status</TableCell>}
                             {!readOnly && <TableCell sx={headStyle} align="right">Actions</TableCell>}
                         </TableRow>
                     </TableHead>
@@ -172,15 +173,14 @@ const StudentTable = ({
                                         </TableCell>
                                     )}
 
-                                    {!isMobile && (
-                                        <TableCell>
-                                            <Chip
-                                                label={`Form ${row.form}`}
-                                                size="small"
-                                                sx={{ bgcolor: '#e0f2fe', color: '#0369a1', fontWeight: 600 }}
-                                            />
-                                        </TableCell>
-                                    )}
+
+                                    <TableCell>
+                                        <Chip
+                                            label={`F ${row.form}`}
+                                            size="small"
+                                            sx={{ bgcolor: '#e0f2fe', color: '#0369a1', fontWeight: 600 }}
+                                        />
+                                    </TableCell>
                                     {!isMobile && (
                                         <TableCell>
                                             <Chip
@@ -191,7 +191,7 @@ const StudentTable = ({
                                         </TableCell>
                                     )}
 
-                                    <TableCell>
+                                    {!isMobile && (<TableCell>
                                         <Chip
                                             label={row.status}
                                             size="small"
@@ -208,34 +208,58 @@ const StudentTable = ({
                                                         : '#b91c1c'
                                             }}
                                         />
-                                    </TableCell>
+                                    </TableCell>)}
 
                                     {!readOnly && (
                                         <TableCell align="right">
                                             <Tooltip title="Edit student">
-                                                <IconButton
+                                                <Button
                                                     size="small"
                                                     onClick={() => onEditClick(row)}
                                                     sx={{
-                                                        color: '#6366f1',
-                                                        '&:hover': { backgroundColor: '#eef2ff' },
-                                                        mr: 1
+                                                        color: '#4f46e5',
+                                                        fontWeight: 700,
+                                                        textTransform: 'none',
+                                                        borderRadius: '10px',
+                                                        px: 2,
+                                                        py: 0.5,
+                                                        backgroundColor: 'rgba(99, 102, 241, 0.08)',
+                                                        border: '1px solid rgba(99, 102, 241, 0.1)',
+                                                        '&:hover': {
+                                                            backgroundColor: 'rgba(99, 102, 241, 0.15)',
+                                                            transform: 'translateY(-1px)',
+                                                            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)'
+                                                        },
+                                                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
                                                     }}
                                                 >
-                                                    <EditIcon fontSize="small" />
-                                                </IconButton>
+                                                    Edit
+                                                </Button>
                                             </Tooltip>
                                             <Tooltip title="Delete student">
-                                                <IconButton
+                                                <Button
                                                     size="small"
                                                     onClick={() => onDeleteClick(row)}
                                                     sx={{
-                                                        color: '#ef4444',
-                                                        '&:hover': { backgroundColor: '#fee2e2' }
+                                                        color: '#4f46e5',
+                                                        fontWeight: 700,
+                                                        textTransform: 'none',
+                                                        borderRadius: '10px',
+                                                        px: 0,
+                                                        ml: 1,
+                                                        py: 0.5,
+                                                        backgroundColor: 'rgba(255, 0, 0, 0.2)',
+                                                        border: '1px solid rgba(255, 0, 0, 0.5)',
+                                                        '&:hover': {
+                                                            backgroundColor: 'rgba(255, 0, 0, 0.5)',
+                                                            transform: 'translateY(-1px)',
+                                                            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)'
+                                                        },
+                                                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
                                                     }}
                                                 >
-                                                    <DeleteIcon fontSize="small" />
-                                                </IconButton>
+                                                    Delete
+                                                </Button>
                                             </Tooltip>
                                         </TableCell>
                                     )}

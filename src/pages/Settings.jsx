@@ -26,16 +26,16 @@ function Settings() {
 
     return (
         <Box sx={{ width: '100%', typography: 'body1' }}>
-            <Box sx={{ mb: 3 }}>
+            <Box sx={{ mb: 2 }} padding={2}>
                 <Typography variant="h6" sx={{ fontWeight: 700, color: '#1e293b' }}>
                     System Settings
                 </Typography>
                 <Typography variant="body2" color="textSecondary">
-                    Manage grading systems, school information, and general configurations.
+                    Manage grading system, school information, and general configurations.
                 </Typography>
             </Box>
 
-            <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
+            <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
                 <Tabs
                     value={tabIndex}
                     onChange={handleChange}
