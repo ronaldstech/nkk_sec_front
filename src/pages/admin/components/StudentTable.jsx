@@ -35,7 +35,8 @@ const StudentTable = ({
     onEditClick,
     onDeleteClick, // New prop for delete action
     search = '',
-    onSearchChange
+    onSearchChange,
+    readOnly = false
 }) => {
 
     /* ================= RESPONSIVE ================= */
@@ -126,7 +127,7 @@ const StudentTable = ({
                             {!isMobile && <TableCell sx={headStyle}>School</TableCell>}
 
                             <TableCell sx={headStyle}>Status</TableCell>
-                            <TableCell sx={headStyle} align="right">Actions</TableCell>
+                            {!readOnly && <TableCell sx={headStyle} align="right">Actions</TableCell>}
                         </TableRow>
                     </TableHead>
 
@@ -209,33 +210,35 @@ const StudentTable = ({
                                         />
                                     </TableCell>
 
-                                    <TableCell align="right">
-                                        <Tooltip title="Edit student">
-                                            <IconButton
-                                                size="small"
-                                                onClick={() => onEditClick(row)}
-                                                sx={{
-                                                    color: '#6366f1',
-                                                    '&:hover': { backgroundColor: '#eef2ff' },
-                                                    mr: 1
-                                                }}
-                                            >
-                                                <EditIcon fontSize="small" />
-                                            </IconButton>
-                                        </Tooltip>
-                                        <Tooltip title="Delete student">
-                                            <IconButton
-                                                size="small"
-                                                onClick={() => onDeleteClick(row)}
-                                                sx={{
-                                                    color: '#ef4444',
-                                                    '&:hover': { backgroundColor: '#fee2e2' }
-                                                }}
-                                            >
-                                                <DeleteIcon fontSize="small" />
-                                            </IconButton>
-                                        </Tooltip>
-                                    </TableCell>
+                                    {!readOnly && (
+                                        <TableCell align="right">
+                                            <Tooltip title="Edit student">
+                                                <IconButton
+                                                    size="small"
+                                                    onClick={() => onEditClick(row)}
+                                                    sx={{
+                                                        color: '#6366f1',
+                                                        '&:hover': { backgroundColor: '#eef2ff' },
+                                                        mr: 1
+                                                    }}
+                                                >
+                                                    <EditIcon fontSize="small" />
+                                                </IconButton>
+                                            </Tooltip>
+                                            <Tooltip title="Delete student">
+                                                <IconButton
+                                                    size="small"
+                                                    onClick={() => onDeleteClick(row)}
+                                                    sx={{
+                                                        color: '#ef4444',
+                                                        '&:hover': { backgroundColor: '#fee2e2' }
+                                                    }}
+                                                >
+                                                    <DeleteIcon fontSize="small" />
+                                                </IconButton>
+                                            </Tooltip>
+                                        </TableCell>
+                                    )}
                                 </TableRow>
                             ))}
                     </TableBody>

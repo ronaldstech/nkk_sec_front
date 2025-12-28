@@ -20,7 +20,8 @@ import {
     TableContainer,
     IconButton,
     Chip,
-    Stack
+    Stack,
+    LinearProgress
 } from '@mui/material';
 import {
     Add as AddIcon,
@@ -43,9 +44,11 @@ function Grading() {
     const [grades, setGrades] = useState([]);
     const [seletype, setSeletype] = useState('senior');
     const [edit, setEdit] = useState({});
+    const [loading, setLoading] = useState(false);
 
     // Fetch grades
     const getRowGrades = async () => {
+        setLoading(true);
         try {
             const res = await fetch(`${API_URL}?getRowGrades=true`);
             const data = await res.json();
@@ -57,6 +60,8 @@ function Grading() {
         } catch (error) {
             console.error("Error fetching grades:", error);
             Toastify({ text: "Failed to load grades", backgroundColor: "#ef4444" }).showToast();
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -148,7 +153,13 @@ function Grading() {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {grades.map((row, index) => (
+                            {loading ? (
+                                <TableRow>
+                                    <TableCell colSpan={7} sx={{ p: 0 }}>
+                                        <LinearProgress sx={{ bgcolor: '#e0e7ff', '& .MuiLinearProgress-bar': { bgcolor: '#6366f1' } }} />
+                                    </TableCell>
+                                </TableRow>
+                            ) : grades.map((row, index) => (
                                 <TableRow key={index} hover>
                                     <TableCell sx={{ color: '#64748b' }}>{index + 1}</TableCell>
                                     <TableCell sx={{ textTransform: 'capitalize' }}>{row.level}</TableCell>

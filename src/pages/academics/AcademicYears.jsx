@@ -18,7 +18,8 @@ import {
     Chip,
     InputAdornment,
     Stack,
-    Divider
+    Divider,
+    LinearProgress
 } from '@mui/material';
 import {
     Add as AddIcon,
@@ -35,15 +36,17 @@ import "toastify-js/src/toastify.css";
 
 const API_URL = "https://unimarket-mw.com/smis-api/api/index.php";
 
-function AcademicYears() {
+function AcademicYears({ readOnly = false }) {
     const [open, setOpen] = useState({
         add: false,
         edit: false
     });
     const [rows, setRows] = useState([]);
     const [edit, setEdit] = useState({});
+    const [loading, setLoading] = useState(false);
 
     const fetchAcademicYears = async () => {
+        setLoading(true);
         try {
             const res = await fetch(`${API_URL}?getAcademicYears=1`);
             const data = await res.json();
@@ -51,6 +54,8 @@ function AcademicYears() {
         } catch (error) {
             console.error("Error fetching academic years:", error);
             Toastify({ text: "Failed to load academic years", backgroundColor: "#ef4444" }).showToast();
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -123,19 +128,21 @@ function AcademicYears() {
                 <Typography variant="h6" sx={{ fontWeight: 700, color: '#1e293b' }}>
                     Academic Years
                 </Typography>
-                <Button
-                    variant="contained"
-                    startIcon={<AddIcon />}
-                    onClick={() => setOpen({ ...open, add: true })}
-                    sx={{
-                        borderRadius: 2,
-                        textTransform: 'none',
-                        background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-                        boxShadow: '0 4px 12px rgba(99, 102, 241, 0.3)'
-                    }}
-                >
-                    Add Academic Year
-                </Button>
+                {!readOnly && (
+                    <Button
+                        variant="contained"
+                        startIcon={<AddIcon />}
+                        onClick={() => setOpen({ ...open, add: true })}
+                        sx={{
+                            borderRadius: 2,
+                            textTransform: 'none',
+                            background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+                            boxShadow: '0 4px 12px rgba(99, 102, 241, 0.3)'
+                        }}
+                    >
+                        Add Academic Year
+                    </Button>
+                )}
             </Box>
 
             <Paper elevation={0} sx={{ borderRadius: 2, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
@@ -151,11 +158,17 @@ function AcademicYears() {
                                 <TableCell sx={{ fontWeight: 600, color: '#475569' }}>Next Term</TableCell>
                                 <TableCell sx={{ fontWeight: 600, color: '#475569' }}>Fees</TableCell>
                                 <TableCell sx={{ fontWeight: 600, color: '#475569' }}>Status</TableCell>
-                                <TableCell sx={{ fontWeight: 600, color: '#475569' }} align="right">Actions</TableCell>
+                                {!readOnly && <TableCell sx={{ fontWeight: 600, color: '#475569' }} align="right">Actions</TableCell>}
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {rows.length === 0 ? (
+                            {loading ? (
+                                <TableRow>
+                                    <TableCell colSpan={9} sx={{ p: 0 }}>
+                                        <LinearProgress sx={{ bgcolor: '#e0e7ff', '& .MuiLinearProgress-bar': { bgcolor: '#6366f1' } }} />
+                                    </TableCell>
+                                </TableRow>
+                            ) : rows.length === 0 ? (
                                 <TableRow>
                                     <TableCell colSpan={9} align="center" sx={{ py: 4, color: '#64748b' }}>No data found.</TableCell>
                                 </TableRow>
@@ -181,18 +194,20 @@ function AcademicYears() {
                                                 }}
                                             />
                                         </TableCell>
-                                        <TableCell align="right">
-                                            <IconButton
-                                                size="small"
-                                                onClick={() => {
-                                                    setEdit(row);
-                                                    setOpen({ ...open, edit: true });
-                                                }}
-                                                sx={{ color: '#6366f1' }}
-                                            >
-                                                <EditIcon fontSize="small" />
-                                            </IconButton>
-                                        </TableCell>
+                                        {!readOnly && (
+                                            <TableCell align="right">
+                                                <IconButton
+                                                    size="small"
+                                                    onClick={() => {
+                                                        setEdit(row);
+                                                        setOpen({ ...open, edit: true });
+                                                    }}
+                                                    sx={{ color: '#6366f1' }}
+                                                >
+                                                    <EditIcon fontSize="small" />
+                                                </IconButton>
+                                            </TableCell>
+                                        )}
                                     </TableRow>
                                 ))
                             )}

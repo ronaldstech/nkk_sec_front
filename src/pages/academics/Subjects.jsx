@@ -22,7 +22,8 @@ import {
     Chip,
     InputAdornment,
     Stack,
-    Divider
+    Divider,
+    LinearProgress
 } from '@mui/material';
 import {
     Add as AddIcon,
@@ -37,7 +38,7 @@ import "toastify-js/src/toastify.css";
 
 const API_URL = "https://unimarket-mw.com/smis-api/api/index.php";
 
-function Subjects() {
+function Subjects({ readOnly = false }) {
     const [root, setRoot] = useState("");
     const [open, setOpen] = useState({
         add: false,
@@ -45,9 +46,11 @@ function Subjects() {
     });
     const [rows, setRows] = useState([]);
     const [edit, setEdit] = useState({});
+    const [loading, setLoading] = useState(false);
 
     // Fetch subjects using native API
     const getSubjects = async () => {
+        setLoading(true);
         try {
             const res = await fetch(`${API_URL}?getSubjects=true`);
             const data = await res.json();
@@ -55,6 +58,8 @@ function Subjects() {
         } catch (error) {
             console.error("Error fetching subjects:", error);
             Toastify({ text: "Failed to load subjects", backgroundColor: "#ef4444" }).showToast();
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -128,19 +133,21 @@ function Subjects() {
                 <Typography variant="h6" sx={{ fontWeight: 700, color: '#1e293b' }}>
                     All Subjects
                 </Typography>
-                <Button
-                    variant="contained"
-                    startIcon={<AddIcon />}
-                    onClick={() => setOpen({ ...open, add: true })}
-                    sx={{
-                        borderRadius: 2,
-                        textTransform: 'none',
-                        background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-                        boxShadow: '0 4px 12px rgba(79, 70, 229, 0.3)'
-                    }}
-                >
-                    Add Subject
-                </Button>
+                {!readOnly && (
+                    <Button
+                        variant="contained"
+                        startIcon={<AddIcon />}
+                        onClick={() => setOpen({ ...open, add: true })}
+                        sx={{
+                            borderRadius: 2,
+                            textTransform: 'none',
+                            background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+                            boxShadow: '0 4px 12px rgba(79, 70, 229, 0.3)'
+                        }}
+                    >
+                        Add Subject
+                    </Button>
+                )}
             </Box>
 
             <Paper elevation={0} sx={{ borderRadius: 2, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
@@ -152,11 +159,17 @@ function Subjects() {
                                 <TableCell sx={{ fontWeight: 600, color: '#475569' }}>Subject Name</TableCell>
                                 <TableCell sx={{ fontWeight: 600, color: '#475569' }}>Root Category</TableCell>
                                 <TableCell sx={{ fontWeight: 600, color: '#475569' }}>Status</TableCell>
-                                <TableCell sx={{ fontWeight: 600, color: '#475569' }} align="right">Actions</TableCell>
+                                {!readOnly && <TableCell sx={{ fontWeight: 600, color: '#475569' }} align="right">Actions</TableCell>}
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {rows.length === 0 ? (
+                            {loading ? (
+                                <TableRow>
+                                    <TableCell colSpan={5} sx={{ p: 0 }}>
+                                        <LinearProgress sx={{ bgcolor: '#e0e7ff', '& .MuiLinearProgress-bar': { bgcolor: '#6366f1' } }} />
+                                    </TableCell>
+                                </TableRow>
+                            ) : rows.length === 0 ? (
                                 <TableRow>
                                     <TableCell colSpan={5} align="center" sx={{ py: 4, color: '#64748b' }}>
                                         No subjects found.
@@ -191,25 +204,27 @@ function Subjects() {
                                                 }}
                                             />
                                         </TableCell>
-                                        <TableCell align="right">
-                                            <Button
-                                                variant="outlined"
-                                                size="small"
-                                                startIcon={<EditIcon />}
-                                                onClick={() => {
-                                                    setEdit(row);
-                                                    setOpen({ ...open, edit: true });
-                                                }}
-                                                sx={{
-                                                    textTransform: 'none',
-                                                    borderRadius: 2,
-                                                    color: '#6366f1',
-                                                    borderColor: '#e2e8f0'
-                                                }}
-                                            >
-                                                Edit
-                                            </Button>
-                                        </TableCell>
+                                        {!readOnly && (
+                                            <TableCell align="right">
+                                                <Button
+                                                    variant="outlined"
+                                                    size="small"
+                                                    startIcon={<EditIcon />}
+                                                    onClick={() => {
+                                                        setEdit(row);
+                                                        setOpen({ ...open, edit: true });
+                                                    }}
+                                                    sx={{
+                                                        textTransform: 'none',
+                                                        borderRadius: 2,
+                                                        color: '#6366f1',
+                                                        borderColor: '#e2e8f0'
+                                                    }}
+                                                >
+                                                    Edit
+                                                </Button>
+                                            </TableCell>
+                                        )}
                                     </TableRow>
                                 ))
                             )}

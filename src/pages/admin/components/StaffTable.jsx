@@ -33,7 +33,8 @@ const StaffTable = ({
     onRowsPerPageChange,
     onEditClick,
     search = '',
-    onSearchChange
+    onSearchChange,
+    readOnly = false
 }) => {
 
     /* ================= RESPONSIVE ================= */
@@ -116,7 +117,7 @@ const StaffTable = ({
                             {!isMobile && <TableCell sx={headStyle}>Account</TableCell>}
 
                             <TableCell sx={headStyle}>Status</TableCell>
-                            <TableCell sx={headStyle} align="right">Action</TableCell>
+                            {!readOnly && <TableCell sx={headStyle} align="right">Action</TableCell>}
                         </TableRow>
                     </TableHead>
 
@@ -205,22 +206,24 @@ const StaffTable = ({
                                         />
                                     </TableCell>
 
-                                    <TableCell align="right">
-                                        <Tooltip title="Edit staff">
-                                            <IconButton
-                                                size="small"
-                                                onClick={() => onEditClick(row)}
-                                                sx={{
-                                                    color: '#6366f1',
-                                                    '&:hover': {
-                                                        backgroundColor: '#eef2ff'
-                                                    }
-                                                }}
-                                            >
-                                                <EditIcon fontSize="small" />
-                                            </IconButton>
-                                        </Tooltip>
-                                    </TableCell>
+                                    {!readOnly && (
+                                        <TableCell align="right">
+                                            <Tooltip title="Edit staff">
+                                                <IconButton
+                                                    size="small"
+                                                    onClick={() => onEditClick(row)}
+                                                    sx={{
+                                                        color: '#6366f1',
+                                                        '&:hover': {
+                                                            backgroundColor: '#eef2ff'
+                                                        }
+                                                    }}
+                                                >
+                                                    <EditIcon fontSize="small" />
+                                                </IconButton>
+                                            </Tooltip>
+                                        </TableCell>
+                                    )}
                                 </TableRow>
                             ))}
                     </TableBody>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
     Box,
     Fade,
@@ -22,6 +22,7 @@ import StudentTable from './components/StudentTable';
 import StudentAddDialog from './components/StudentAddDialog';
 import StudentEditDrawer from './components/StudentEditDrawer';
 import StudentDeleteDialog from './components/StudentDeleteDialog';
+import { AppContext } from '../../context/AppContext';
 
 const API_URL = "https://unimarket-mw.com/smis-api/api/index.php";
 
@@ -83,6 +84,9 @@ const StatCard = ({ title, count, icon, color }) => (
 );
 
 function StudentsAdmin() {
+    const { user } = useContext(AppContext);
+    const isReadOnly = !user?.isAdmin;
+
     const [open, setOpen] = useState({
         add: false,
         edit: false,
@@ -276,21 +280,23 @@ function StudentsAdmin() {
                                 Export PDF
                             </Button>
 
-                            <Button
-                                fullWidth
-                                variant="contained"
-                                startIcon={<PersonAddIcon />}
-                                onClick={() => setOpen({ ...open, add: true })}
-                                sx={{
-                                    borderRadius: 2,
-                                    textTransform: 'none',
-                                    px: 3,
-                                    background: 'linear-gradient(135deg,#6366f1,#4f46e5)',
-                                    boxShadow: '0 6px 20px rgba(79,70,229,.35)'
-                                }}
-                            >
-                                Add Student
-                            </Button>
+                            {!isReadOnly && (
+                                <Button
+                                    fullWidth
+                                    variant="contained"
+                                    startIcon={<PersonAddIcon />}
+                                    onClick={() => setOpen({ ...open, add: true })}
+                                    sx={{
+                                        borderRadius: 2,
+                                        textTransform: 'none',
+                                        px: 3,
+                                        background: 'linear-gradient(135deg,#6366f1,#4f46e5)',
+                                        boxShadow: '0 6px 20px rgba(79,70,229,.35)'
+                                    }}
+                                >
+                                    Add Student
+                                </Button>
+                            )}
                         </Stack>
                     </Stack>
                 </Paper>
@@ -345,6 +351,7 @@ function StudentsAdmin() {
                             setActive(student);
                             setOpen({ ...open, delet: true });
                         }}
+                        readOnly={isReadOnly}
                     />
                 </Box>
 

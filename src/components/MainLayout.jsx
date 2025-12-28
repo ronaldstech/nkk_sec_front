@@ -42,13 +42,20 @@ function MainLayout({ children, menus }) {
     // We can infer the "stage" or active menu from the location path
     const getActiveMenu = () => {
         const path = location.pathname;
-        if (path === '/') return 'Dashboard';
-        if (path.startsWith('/staff')) return 'Staff';
-        if (path.startsWith('/students')) return 'Students';
-        if (path.startsWith('/academics')) return 'Academics';
-        if (path.startsWith('/results')) return 'Results';
-        if (path.startsWith('/profile')) return 'Profile';
+        if (path === '/' || path === '/portal/staff') return 'Dashboard';
+
+        // Check specifics first
+        if (path.includes('/my-classes')) return 'My Classes';
+        if (path.includes('/students')) return 'Students';
+        if (path.includes('/academics')) return 'Academics';
+        if (path.includes('/results')) return 'Results';
+        if (path.includes('/profile')) return 'Profile';
         if (path.startsWith('/settings')) return 'Settings';
+
+        // Last check for Staff (catches /staff and /portal/staff/staff)
+        // Since we already filtered exact /portal/staff above, this is safe for /portal/staff/staff
+        if (path.includes('/staff')) return 'Staff';
+
         return 'Dashboard';
     };
 
@@ -95,7 +102,7 @@ function MainLayout({ children, menus }) {
             }}>
                 <div style={{ position: 'relative', display: 'inline-block' }}>
                     <img
-                        src="images/profile.jpg"
+                        src="/images/profile.jpg"
                         className="w3-circle"
                         style={{
                             width: "105px",
@@ -123,18 +130,33 @@ function MainLayout({ children, menus }) {
                     {user?.username || 'User'}
                 </Typography>
 
-                <div style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    backgroundColor: 'rgba(255, 117, 140, 0.1)',
-                    padding: '2px 12px',
-                    borderRadius: '20px',
-                    marginTop: '8px'
-                }}>
-                    <Typography variant="caption" sx={{ color: '#ff758c', fontWeight: 700, fontSize: '0.7rem', textTransform: 'uppercase' }}>
-                        {academic.name}
-                    </Typography>
-                </div>
+                <Box sx={{ mt: 1, display: 'flex', gap: 1, justifyContent: 'center', flexWrap: 'wrap' }}>
+                    <div style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        backgroundColor: 'rgba(255, 117, 140, 0.1)',
+                        padding: '2px 12px',
+                        borderRadius: '20px',
+                    }}>
+                        <Typography variant="caption" sx={{ color: '#ff758c', fontWeight: 700, fontSize: '0.7rem', textTransform: 'uppercase' }}>
+                            Academic Year: {academic.name}
+                        </Typography>
+                    </div>
+
+                    <div style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        padding: '2px 12px',
+                        borderRadius: '20px',
+                    }}>
+                        <Typography variant="caption" sx={{ color: '#6366f1', fontWeight: 700, fontSize: '0.7rem', textTransform: 'uppercase' }}>
+                            Role: {user?.role || 'Privileged'}
+                        </Typography>
+                    </div>
+                </Box>
+
+
             </div>
 
             {/* Menu Items Section */}

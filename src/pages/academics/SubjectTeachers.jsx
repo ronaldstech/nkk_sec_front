@@ -14,7 +14,7 @@ import AssignSubjectDialog from './components/AssignSubjectDialog';
 
 const API_URL = "https://unimarket-mw.com/smis-api/api/index.php";
 
-function SubjectTeachers() {
+function SubjectTeachers({ readOnly = false }) {
     const [rows, setRows] = useState([]);
     const [academic, setAcademic] = useState({ id: 0, name: "Loading...", term: "" });
     const [open, setOpen] = useState({ add: false, addsub: false });
@@ -130,7 +130,7 @@ function SubjectTeachers() {
                             <TableCell sx={{ fontWeight: 700, color: '#475569' }}>Teacher</TableCell>
                             <TableCell sx={{ fontWeight: 700, color: '#475569' }}>Workload</TableCell>
                             <TableCell sx={{ fontWeight: 700, color: '#475569' }}>Subjects</TableCell>
-                            <TableCell align="right" sx={{ fontWeight: 700, color: '#475569' }}>Actions</TableCell>
+                            {!readOnly && <TableCell align="right" sx={{ fontWeight: 700, color: '#475569' }}>Actions</TableCell>}
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -199,20 +199,22 @@ function SubjectTeachers() {
                                             )}
                                         </Box>
                                     </TableCell>
-                                    <TableCell align="right">
-                                        <Tooltip title="Manage Schedule">
-                                            <IconButton
-                                                onClick={() => {
-                                                    setManage(row);
-                                                    setOpen({ ...open, add: true });
-                                                    getSubt(row.id, academic.id);
-                                                }}
-                                                sx={{ color: '#6366f1', bgcolor: '#f5f3ff', '&:hover': { bgcolor: '#e0e7ff' } }}
-                                            >
-                                                <SettingsIcon fontSize="small" />
-                                            </IconButton>
-                                        </Tooltip>
-                                    </TableCell>
+                                    {!readOnly && (
+                                        <TableCell align="right">
+                                            <Tooltip title="Manage Schedule">
+                                                <IconButton
+                                                    onClick={() => {
+                                                        setManage(row);
+                                                        setOpen({ ...open, add: true });
+                                                        getSubt(row.id, academic.id);
+                                                    }}
+                                                    sx={{ color: '#6366f1', bgcolor: '#f5f3ff', '&:hover': { bgcolor: '#e0e7ff' } }}
+                                                >
+                                                    <SettingsIcon fontSize="small" />
+                                                </IconButton>
+                                            </Tooltip>
+                                        </TableCell>
+                                    )}
                                 </TableRow>
                             ))
                         )}

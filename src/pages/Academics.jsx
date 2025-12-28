@@ -18,8 +18,13 @@ import {
 import Subjects from './academics/Subjects';
 import SubjectTeachers from './academics/SubjectTeachers';
 import AcademicYears from './academics/AcademicYears';
+import { AppContext } from '../context/AppContext';
+import { useContext } from 'react';
 
 function Academics() {
+    const { user } = useContext(AppContext);
+    const isReadOnly = !user?.isAdmin;
+
     const [tabIndex, setTabIndex] = useState(0);
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -124,13 +129,13 @@ function Academics() {
                             >
                                 {/* Conditional Rendering with specialized Fade */}
                                 <TabPanel value={tabIndex} index={0}>
-                                    <SubjectTeachers />
+                                    <SubjectTeachers readOnly={isReadOnly} />
                                 </TabPanel>
                                 <TabPanel value={tabIndex} index={1}>
-                                    <Subjects />
+                                    <Subjects readOnly={isReadOnly} />
                                 </TabPanel>
                                 <TabPanel value={tabIndex} index={2}>
-                                    <AcademicYears />
+                                    <AcademicYears readOnly={isReadOnly} />
                                 </TabPanel>
                             </Paper>
                         </Box>

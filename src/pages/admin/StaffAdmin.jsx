@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
     Box,
     Button,
@@ -22,6 +22,7 @@ import "toastify-js/src/toastify.css";
 import StaffTable from './components/StaffTable';
 import StaffAddDialog from './components/StaffAddDialog';
 import StaffEditDrawer from './components/StaffEditDrawer';
+import { AppContext } from '../../context/AppContext';
 
 const API_URL = "https://unimarket-mw.com/smis-api/api/index.php";
 
@@ -93,6 +94,9 @@ function StaffAdmin() {
     const [loading, setLoading] = useState(false);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
+    const { user } = useContext(AppContext);
+
+    const isReadOnly = !user?.isAdmin;
 
     /* ===== DERIVED STATS ===== */
     const totalStaff = rows.length;
@@ -186,21 +190,23 @@ function StaffAdmin() {
                                 Export
                             </Button>
 
-                            <Button
-                                fullWidth
-                                variant="contained"
-                                startIcon={<PersonAddIcon />}
-                                onClick={() => setOpen({ ...open, add: true })}
-                                sx={{
-                                    borderRadius: 2,
-                                    textTransform: 'none',
-                                    px: 3,
-                                    background: 'linear-gradient(135deg,#6366f1,#4f46e5)',
-                                    boxShadow: '0 6px 20px rgba(79,70,229,.35)'
-                                }}
-                            >
-                                Add Staff
-                            </Button>
+                            {!isReadOnly && (
+                                <Button
+                                    fullWidth
+                                    variant="contained"
+                                    startIcon={<PersonAddIcon />}
+                                    onClick={() => setOpen({ ...open, add: true })}
+                                    sx={{
+                                        borderRadius: 2,
+                                        textTransform: 'none',
+                                        px: 3,
+                                        background: 'linear-gradient(135deg,#6366f1,#4f46e5)',
+                                        boxShadow: '0 6px 20px rgba(79,70,229,.35)'
+                                    }}
+                                >
+                                    Add Staff
+                                </Button>
+                            )}
                         </Stack>
                     </Stack>
                 </Paper>
@@ -260,6 +266,7 @@ function StaffAdmin() {
                                 setActive(staff);
                                 setOpen({ ...open, edit: true });
                             }}
+                            readOnly={isReadOnly}
                         />
                     </Box>
                 </Paper>
