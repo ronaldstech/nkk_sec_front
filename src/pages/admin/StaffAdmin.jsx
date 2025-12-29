@@ -121,6 +121,78 @@ function StaffAdmin() {
         }
     };
 
+    /* ===== UPDATE STAFF ===== */
+    const handleUpdateStaff = async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+
+        try {
+            const res = await fetch(API_URL, {
+                method: "POST",
+                body: formData
+            });
+            const data = await res.json();
+
+            if (data.status) {
+                Toastify({
+                    text: data.message || "Updated successfully",
+                    backgroundColor: "#10b981",
+                    duration: 3000
+                }).showToast();
+                setOpen({ ...open, edit: false });
+                getStaff();
+            } else {
+                Toastify({
+                    text: data.message || "Update failed",
+                    backgroundColor: "#ef4444",
+                    duration: 3000
+                }).showToast();
+            }
+        } catch (err) {
+            Toastify({
+                text: "An error occurred. Please try again.",
+                backgroundColor: "#ef4444",
+                duration: 3000
+            }).showToast();
+        }
+    };
+
+    /* ===== UPDATE STATUS ===== */
+    const handleStatusUpdate = async (staffId, newStatus) => {
+        const formData = new FormData();
+        formData.append('staff_id', staffId);
+        formData.append('status', newStatus);
+
+        try {
+            const res = await fetch(API_URL, {
+                method: "POST",
+                body: formData
+            });
+            const data = await res.json();
+
+            if (data.status) {
+                Toastify({
+                    text: data.message || "Status updated successfully",
+                    backgroundColor: "#10b981",
+                    duration: 3000
+                }).showToast();
+                getStaff();
+            } else {
+                Toastify({
+                    text: data.message || "Failed to update status",
+                    backgroundColor: "#ef4444",
+                    duration: 3000
+                }).showToast();
+            }
+        } catch (err) {
+            Toastify({
+                text: "An error occurred. Please try again.",
+                backgroundColor: "#ef4444",
+                duration: 3000
+            }).showToast();
+        }
+    };
+
     useEffect(() => {
         getStaff();
     }, []);
@@ -282,6 +354,8 @@ function StaffAdmin() {
                     open={open.edit}
                     activeStaff={active}
                     onClose={() => setOpen({ ...open, edit: false })}
+                    onUpdate={handleUpdateStaff}
+                    onActivate={handleStatusUpdate}
                 />
             </Box>
         </Fade>

@@ -22,6 +22,9 @@ import {
     Save as SaveIcon
 } from '@mui/icons-material';
 
+import Toastify from 'toastify-js';
+import "toastify-js/src/toastify.css";
+
 const StaffAddDialog = ({ open, onClose, onSave }) => {
     const [acc_type, setAcc_type] = useState("");
 
@@ -29,9 +32,40 @@ const StaffAddDialog = ({ open, onClose, onSave }) => {
         setAcc_type(event.target.value);
     };
 
-    const handleSubmit = (e) => {
-        onSave(e);
-        setAcc_type("");
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+
+        try {
+            const res = await fetch("https://unimarket-mw.com/smis-api/api/index.php", {
+                method: "POST",
+                body: formData
+            });
+            const data = await res.json();
+
+            if (data.status) {
+                Toastify({
+                    text: data.message || "Success",
+                    backgroundColor: "#10b981",
+                    duration: 3000
+                }).showToast();
+                onSave();
+                onClose();
+                setAcc_type("");
+            } else {
+                Toastify({
+                    text: data.message || "Failed to add staff",
+                    backgroundColor: "#ef4444",
+                    duration: 3000
+                }).showToast();
+            }
+        } catch (err) {
+            Toastify({
+                text: "An error occurred. Please try again.",
+                backgroundColor: "#ef4444",
+                duration: 3000
+            }).showToast();
+        }
     };
 
     return (
