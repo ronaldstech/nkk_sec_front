@@ -37,7 +37,10 @@ function StaffHome() {
     const [studentLoading, setStudentLoading] = useState(false);
 
     // Derived State
-    const gradedCount = rows.filter(r => r.assessment > 0 && r.end_term > 0).length;
+    const gradedCount = rows.filter(r =>
+        r.assessment !== "" || r.end_term !== ""
+    ).length;
+
     const progress = rows.length > 0 ? Math.round((gradedCount / rows.length) * 100) : 0;
 
     // Actions
@@ -52,7 +55,34 @@ function StaffHome() {
             });
             const res = await fetch(`${API_URL}?${params.toString()}`);
             const data = await res.json();
-            setSub(Array.isArray(data) ? data : []);
+
+            const subjects = Array.isArray(data) ? data : [];
+
+            // Compute progress per subject
+            const subjectsWithProgress = await Promise.all(subjects.map(async (subject) => {
+                try {
+                    const studentParams = new URLSearchParams({
+                        getYourStudents: "true",
+                        form: subject.form,
+                        academic_id: subject.aca_id,
+                        subject_id: subject.subject
+                    });
+                    const studentRes = await fetch(`${API_URL}?${studentParams.toString()}`);
+                    const studentData = await studentRes.json();
+                    const students = Array.isArray(studentData) ? studentData : [];
+
+                    const gradedCount = students.filter(r => r.mark?.assessments || r.mark?.end_term).length;
+                    const totalStudents = students.length || 1; // avoid division by 0
+                    const progress = Math.round((gradedCount / totalStudents) * 100);
+
+                    return { ...subject, progress };
+                } catch {
+                    return { ...subject, progress: 0 };
+                }
+            }));
+
+            setSub(subjectsWithProgress);
+
         } catch (error) {
             console.error("Error fetching subjects:", error);
             Toastify({ text: "Failed to load subjects", backgroundColor: "#ef4444" }).showToast();
@@ -60,6 +90,7 @@ function StaffHome() {
             setLoading(false);
         }
     };
+
 
     const getInfo = async () => {
         try {
@@ -88,7 +119,16 @@ function StaffHome() {
             });
             const res = await fetch(`${API_URL}?${params.toString()}`);
             const data = await res.json();
-            setRows(Array.isArray(data) ? data : []);
+            const normalized = Array.isArray(data)
+                ? data.map(r => ({
+                    ...r,
+                    assessment: r.mark ? r.mark.assessments : "",
+                    end_term: r.mark ? r.mark.end_term : ""
+                }))
+                : [];
+
+            setRows(normalized);
+
         } catch (error) {
             console.error("Error fetching students:", error);
             Toastify({ text: "Failed to load student list", backgroundColor: "#ef4444" }).showToast();
@@ -164,6 +204,10 @@ function StaffHome() {
         }
     };
 
+    const handleLocalRowUpdate = (id, field, value) => {
+        setRows(prev => prev.map(row => row.id === id ? { ...row, [field]: value } : row));
+    };
+
     useEffect(() => {
         if (user.id && academic.id) {
             getSubjects();
@@ -223,6 +267,7 @@ function StaffHome() {
                     isMobile={isMobile}
                     onUpdateMark={updateMark}
                     onUpdateAssessment={updateAssessment}
+                    onLocalUpdate={handleLocalRowUpdate}
                 />
             </Box>
         </Fade>

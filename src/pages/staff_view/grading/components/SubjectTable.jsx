@@ -43,6 +43,7 @@ const SubjectTable = ({ sub, loading, isMobile, academic, onGradeClass, onPrintM
                             {!isMobile && <TableCell sx={{ fontWeight: 700, color: '#475569' }}>Academic Year</TableCell>}
                             {!isMobile && <TableCell sx={{ fontWeight: 700, color: '#475569' }}>Term</TableCell>}
                             <TableCell sx={{ fontWeight: 700, color: '#475569' }}>Class</TableCell>
+                            {!isMobile && <TableCell sx={{ fontWeight: 700, color: '#475569' }}>Grading Progress</TableCell>}
                             <TableCell align="right" sx={{ fontWeight: 700, color: '#475569', pr: 4 }}>Actions</TableCell>
                         </TableRow>
                     </TableHead>
@@ -105,6 +106,26 @@ const SubjectTable = ({ sub, loading, isMobile, academic, onGradeClass, onPrintM
                                             }}
                                         />
                                     </TableCell>
+                                    {!isMobile && <TableCell sx={{ minWidth: 140, pr: 2 }}>
+                                        <Stack spacing={0.5}>
+                                            <Typography variant="caption" fontWeight={700}>{row.progress || 0}%</Typography>
+                                            <LinearProgress
+                                                variant="determinate"
+                                                value={row.progress || 0}
+                                                sx={{
+                                                    width: '100%',
+                                                    height: 6,
+                                                    borderRadius: 4,
+                                                    bgcolor: '#f1f5f9',
+                                                    '& .MuiLinearProgress-bar': {
+                                                        borderRadius: 4,
+                                                        bgcolor: row.progress === 100 ? '#10b981' : '#6366f1'
+                                                    }
+                                                }}
+                                            />
+                                        </Stack>
+                                    </TableCell>}
+
                                     <TableCell align="right" sx={{ pr: 3 }}>
                                         <Stack direction="row" spacing={1.5} justifyContent="flex-end">
                                             <Button

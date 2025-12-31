@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
     Dialog,
     Box,
@@ -17,12 +17,14 @@ import {
     Stack,
     TableContainer,
     Button,
-    Slide
+    Slide,
+    InputBase
 } from '@mui/material';
 import {
     Close as CloseIcon,
     School as SchoolIcon,
-    Visibility as VisibilityIcon
+    Visibility as VisibilityIcon,
+    Search as SearchIcon
 } from '@mui/icons-material';
 
 const GradingDialog = ({
@@ -35,8 +37,18 @@ const GradingDialog = ({
     studentLoading,
     isMobile,
     onUpdateMark,
-    onUpdateAssessment
+    onUpdateAssessment,
+    onLocalUpdate
 }) => {
+    const [search, setSearch] = useState("");
+
+    const filteredRows = rows.filter(row => {
+        const fullName = `${row.last} ${row.first}`.toLowerCase();
+        const reg = (row.student_reg || "").toLowerCase();
+        const term = search.toLowerCase();
+        return fullName.includes(term) || reg.includes(term);
+    });
+
     return (
         <Dialog
             fullScreen
@@ -53,22 +65,53 @@ const GradingDialog = ({
                     bgcolor: '#fff', borderBottom: '1px solid #e2e8f0',
                     position: 'sticky', top: 0, zIndex: 1100
                 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} alignItems={{ xs: 'flex-start', md: 'center' }} sx={{ flexGrow: 1 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <Box sx={{
+                                p: 1, borderRadius: '12px', bgcolor: 'rgba(99, 102, 241, 0.1)', color: '#6366f1',
+                                display: { xs: 'none', sm: 'flex' }
+                            }}>
+                                <SchoolIcon />
+                            </Box>
+                            <Box>
+                                <Typography variant="h6" fontWeight={800} sx={{ color: '#0f172a', lineHeight: 1.2 }}>
+                                    {acaData.name} — Term {acaData.term}
+                                </Typography>
+                                <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                    Form {acaData.form} <span style={{ opacity: 0.3 }}>•</span> Class Student List
+                                </Typography>
+                            </Box>
+                        </Box>
+
+                        {/* Search Bar */}
                         <Box sx={{
-                            p: 1, borderRadius: '12px', bgcolor: 'rgba(99, 102, 241, 0.1)', color: '#6366f1',
-                            display: { xs: 'none', sm: 'flex' }
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1,
+                            px: 2,
+                            py: 0.8,
+                            borderRadius: '12px',
+                            backgroundColor: '#f8fafc',
+                            border: '1px solid #e2e8f0',
+                            width: '100%',
+                            maxWidth: 400,
+                            transition: 'all 0.2s',
+                            '&:focus-within': {
+                                borderColor: '#6366f1',
+                                bgcolor: '#fff',
+                                boxShadow: '0 0 0 4px rgba(99, 102, 241, 0.1)'
+                            }
                         }}>
-                            <SchoolIcon />
+                            <SearchIcon sx={{ color: '#94a3b8', fontSize: 20 }} />
+                            <InputBase
+                                fullWidth
+                                placeholder="Search by name or ID..."
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                sx={{ fontSize: 14, fontWeight: 600 }}
+                            />
                         </Box>
-                        <Box>
-                            <Typography variant="h6" fontWeight={800} sx={{ color: '#0f172a', lineHeight: 1.2 }}>
-                                {acaData.name} — Term {acaData.term}
-                            </Typography>
-                            <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                Form {acaData.form} <span style={{ opacity: 0.3 }}>•</span> Class Student List
-                            </Typography>
-                        </Box>
-                    </Box>
+                    </Stack>
 
                     <Stack direction="row" spacing={3} alignItems="center">
                         {!isMobile && (
@@ -130,20 +173,38 @@ const GradingDialog = ({
                                 boxShadow: '0 10px 40px rgba(0,0,0,0.05)'
                             }}
                         >
-                            <TableContainer sx={{ maxHeight: 'calc(100vh - 160px)' }}>
+                            <TableContainer sx={{ maxHeight: 'calc(100vh - 160px)', overflowX: { xs: 'auto', md: 'hidden' } }}>
                                 <Table stickyHeader>
                                     <TableHead>
                                         <TableRow>
                                             <TableCell sx={{ bgcolor: '#f8fafc', fontWeight: 800, color: '#475569', width: 60 }}>#</TableCell>
-                                            <TableCell sx={{ bgcolor: '#f8fafc', fontWeight: 800, color: '#475569' }}>Student Full Names</TableCell>
-                                            <TableCell sx={{ bgcolor: '#f8fafc', fontWeight: 800, color: '#475569', width: { xs: 120, md: 180 }, textAlign: 'center' }}>
-                                                Assessment <Typography variant="caption" sx={{ display: 'block', opacity: 0.6 }}>(40%)</Typography>
+                                            <TableCell
+                                                sx={{
+                                                    bgcolor: '#f8fafc', fontWeight: 800, color: '#475569',
+                                                    width: { xs: 120, sm: 180, md: 'auto' } // reduce on mobile
+                                                }}
+                                            >
+                                                Student Full Names
                                             </TableCell>
-                                            <TableCell sx={{ bgcolor: '#f8fafc', fontWeight: 800, color: '#475569', width: { xs: 120, md: 180 }, textAlign: 'center' }}>
+                                            <TableCell
+                                                sx={{
+                                                    bgcolor: '#f8fafc', fontWeight: 800, color: '#475569',
+                                                    width: { xs: 120, md: 180 }, textAlign: 'center'
+                                                }}
+                                            >
+                                                Asses <Typography variant="caption" sx={{ display: 'block', opacity: 0.6 }}>(40%)</Typography>
+                                            </TableCell>
+                                            <TableCell
+                                                sx={{
+                                                    bgcolor: '#f8fafc', fontWeight: 800, color: '#475569',
+                                                    width: { xs: 120, md: 180 }, textAlign: 'center'
+                                                }}
+                                            >
                                                 Exam <Typography variant="caption" sx={{ display: 'block', opacity: 0.6 }}>(60%)</Typography>
                                             </TableCell>
                                         </TableRow>
                                     </TableHead>
+
                                     <TableBody>
                                         {studentLoading ? (
                                             Array.from({ length: 8 }).map((_, i) => (
@@ -151,30 +212,36 @@ const GradingDialog = ({
                                                     <TableCell colSpan={4} sx={{ py: 3 }}><LinearProgress sx={{ opacity: 0.1, borderRadius: 2 }} /></TableCell>
                                                 </TableRow>
                                             ))
-                                        ) : rows.length === 0 ? (
+                                        ) : filteredRows.length === 0 ? (
                                             <TableRow>
                                                 <TableCell colSpan={4} align="center" sx={{ py: 10 }}>
                                                     <Box sx={{ opacity: 0.4 }}>
                                                         <VisibilityIcon sx={{ fontSize: 60, mb: 2 }} />
                                                         <Typography fontWeight={700}>No Student Data</Typography>
-                                                        <Typography variant="body2">No students have been enrolled in this class yet.</Typography>
+                                                        <Typography variant="body2">
+                                                            {search ? `No results found for "${search}"` : "No students have been enrolled in this class yet."}
+                                                        </Typography>
                                                     </Box>
                                                 </TableCell>
                                             </TableRow>
                                         ) : (
-                                            rows.map((row, index) => (
+                                            filteredRows.map((row, index) => (
                                                 <TableRow
-                                                    key={index}
+                                                    key={row.id}
                                                     hover
-                                                    sx={{ '&:hover': { bgcolor: '#f8fafc' } }}
+                                                    sx={{
+                                                        bgcolor:
+                                                            row.assessment !== "" || row.end_term !== ""
+                                                                ? 'rgba(82, 98, 240, 0.2)'
+                                                                : 'inherit',
+                                                        '&:hover': { bgcolor: '#f8fafc' }
+                                                    }}
                                                 >
+
                                                     <TableCell sx={{ color: '#94a3b8', fontWeight: 600 }}>{index + 1}</TableCell>
                                                     <TableCell>
-                                                        <Typography sx={{ fontWeight: 700, color: '#1e293b' }}>
+                                                        <Typography variant='label' sx={{ color: '#1e293b' }}>
                                                             {row.last.toUpperCase() + " " + row.first.toUpperCase() || "Unknown Student"}
-                                                        </Typography>
-                                                        <Typography variant="caption" sx={{ color: '#64748b' }}>
-                                                            ID: {row.student_reg || "N/A"}
                                                         </Typography>
                                                     </TableCell>
                                                     <TableCell>
@@ -182,7 +249,8 @@ const GradingDialog = ({
                                                             size="small"
                                                             type="number"
                                                             variant="outlined"
-                                                            defaultValue={row.assessment}
+                                                            value={row.assessment || ""}
+                                                            onChange={e => onLocalUpdate(row.id, 'assessment', e.target.value)}
                                                             onBlur={e => onUpdateAssessment(row.id, acaData.subject_id, acaData.form, acaData.academic_id, e.target.value)}
                                                             InputProps={{
                                                                 endAdornment: <InputAdornment position="end" sx={{ '& .MuiTypography-root': { fontSize: 12, fontWeight: 700, opacity: 0.5 } }}>%</InputAdornment>,
@@ -209,7 +277,8 @@ const GradingDialog = ({
                                                             size="small"
                                                             type="number"
                                                             variant="outlined"
-                                                            defaultValue={row.end_term}
+                                                            value={row.end_term || ""}
+                                                            onChange={e => onLocalUpdate(row.id, 'end_term', e.target.value)}
                                                             onBlur={e => onUpdateMark(row.id, acaData.subject_id, acaData.form, acaData.academic_id, e.target.value)}
                                                             InputProps={{
                                                                 endAdornment: <InputAdornment position="end" sx={{ '& .MuiTypography-root': { fontSize: 12, fontWeight: 700, opacity: 0.5 } }}>%</InputAdornment>,
