@@ -50,6 +50,7 @@ function MainLayout({ children, menus }) {
         if (path.includes('/academics')) return 'Academics';
         if (path.includes('/results')) return 'Results';
         if (path.includes('/profile')) return 'Profile';
+        if (path.includes('/workload')) return 'Workload';
         if (path.startsWith('/settings')) return 'Settings';
 
         // Last check for Staff (catches /staff and /portal/staff/staff)
