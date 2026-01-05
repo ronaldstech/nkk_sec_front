@@ -84,7 +84,7 @@ const StatCard = ({ title, count, icon, color }) => (
 );
 
 function StudentsAdmin() {
-    const { user } = useContext(AppContext);
+    const { user, schoolType } = useContext(AppContext);
     const isReadOnly = !user?.isAdmin;
 
     const [open, setOpen] = useState({
@@ -109,7 +109,7 @@ function StudentsAdmin() {
     const getStudents = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`${API_URL}?getStudents=true`);
+            const res = await fetch(`${API_URL}?getStudents=true&school_type=${schoolType}`);
             const data = await res.json();
             if (Array.isArray(data)) {
                 setRows(data);
@@ -128,7 +128,7 @@ function StudentsAdmin() {
 
     useEffect(() => {
         getStudents();
-    }, []);
+    }, [schoolType]);
 
     /* ===== HANDLERS ===== */
     const handleFormSubmit = async (event, action) => {

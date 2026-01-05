@@ -94,7 +94,7 @@ function StaffAdmin() {
     const [loading, setLoading] = useState(false);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
-    const { user } = useContext(AppContext);
+    const { user, schoolType } = useContext(AppContext);
 
     const isReadOnly = !user?.isAdmin;
 
@@ -107,7 +107,7 @@ function StaffAdmin() {
     const getStaff = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`${API_URL}?getStaff=true`);
+            const res = await fetch(`${API_URL}?getStaff=true&school_type=${schoolType}`);
             const data = await res.json();
             if (Array.isArray(data)) setRows(data);
         } catch (err) {
@@ -195,7 +195,7 @@ function StaffAdmin() {
 
     useEffect(() => {
         getStaff();
-    }, []);
+    }, [schoolType]);
 
     return (
         <Fade in timeout={600}>

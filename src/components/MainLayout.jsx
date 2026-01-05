@@ -28,7 +28,7 @@ import {
 import { useAppContext } from '../context/AppContext';
 
 function MainLayout({ children, menus }) {
-    const { user, academic, logout } = useAppContext();
+    const { user, academic, schoolType, toggleSchoolType, logout } = useAppContext();
     const navigate = useNavigate();
     const location = useLocation();
     const theme = useTheme();
@@ -154,6 +154,56 @@ function MainLayout({ children, menus }) {
                             Role: {user?.role || 'Privileged'}
                         </Typography>
                     </div>
+                </Box>
+
+                {/* School Type Switcher */}
+                <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
+                    <Box sx={{
+                        display: 'inline-flex',
+                        bgcolor: 'rgba(226, 232, 240, 0.5)',
+                        borderRadius: '12px',
+                        p: 0.5,
+                        width: '85%'
+                    }}>
+                        <Box
+                            onClick={() => toggleSchoolType('day')}
+                            sx={{
+                                flex: 1,
+                                py: 1,
+                                cursor: 'pointer',
+                                textAlign: 'center',
+                                borderRadius: '10px',
+                                transition: 'all 0.3s ease',
+                                bgcolor: schoolType === 'day' ? '#fff' : 'transparent',
+                                color: schoolType === 'day' ? '#6366f1' : '#64748b',
+                                boxShadow: schoolType === 'day' ? '0 2px 8px rgba(0,0,0,0.05)' : 'none',
+                                '&:hover': { bgcolor: schoolType === 'day' ? '#fff' : 'rgba(255,255,255,0.3)' }
+                            }}
+                        >
+                            <Typography variant="caption" sx={{ fontWeight: 800, fontSize: '0.7rem' }}>
+                                DAY
+                            </Typography>
+                        </Box>
+                        <Box
+                            onClick={() => toggleSchoolType('open')}
+                            sx={{
+                                flex: 1,
+                                py: 1,
+                                cursor: 'pointer',
+                                textAlign: 'center',
+                                borderRadius: '10px',
+                                transition: 'all 0.3s ease',
+                                bgcolor: schoolType === 'open' ? '#fff' : 'transparent',
+                                color: schoolType === 'open' ? '#6366f1' : '#64748b',
+                                boxShadow: schoolType === 'open' ? '0 2px 8px rgba(0,0,0,0.05)' : 'none',
+                                '&:hover': { bgcolor: schoolType === 'open' ? '#fff' : 'rgba(255,255,255,0.3)' }
+                            }}
+                        >
+                            <Typography variant="caption" sx={{ fontWeight: 800, fontSize: '0.7rem' }}>
+                                OPEN
+                            </Typography>
+                        </Box>
+                    </Box>
                 </Box>
 
 

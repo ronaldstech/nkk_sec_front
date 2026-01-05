@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { AppContext } from '../../context/AppContext';
 import {
     Button,
     Dialog,
@@ -41,6 +42,7 @@ import "toastify-js/src/toastify.css";
 const API_URL = "https://unimarket-mw.com/smis-api/api/index.php";
 
 function Subjects({ readOnly = false }) {
+    const { schoolType } = useContext(AppContext);
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const [root, setRoot] = useState("");
@@ -56,7 +58,7 @@ function Subjects({ readOnly = false }) {
     const getSubjects = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`${API_URL}?getSubjects=true`);
+            const res = await fetch(`${API_URL}?getSubjects=true&school_type=${schoolType}`);
             const data = await res.json();
             setRows(data);
         } catch (error) {
@@ -129,7 +131,7 @@ function Subjects({ readOnly = false }) {
 
     useEffect(() => {
         getSubjects();
-    }, []);
+    }, [schoolType]);
 
     return (
         <Box>

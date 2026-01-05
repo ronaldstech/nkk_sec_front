@@ -23,6 +23,10 @@ export const AppProvider = ({ children }) => {
         };
     });
 
+    const [schoolType, setSchoolType] = useState(() => {
+        return localStorage.getItem('schoolType') || 'day';
+    });
+
     const [academic, setAcademic] = useState({
         id: 0,
         name: "Academic Name"
@@ -44,7 +48,7 @@ export const AppProvider = ({ children }) => {
 
     const getAcademic = async () => {
         try {
-            const response = await fetch(`${API_URL}?getAcademic=true`);
+            const response = await fetch(`${API_URL}?getAcademic=true&school_type=${schoolType}`);
             if (response.ok) {
                 const res = await response.json();
                 if (res) {
@@ -82,7 +86,14 @@ export const AppProvider = ({ children }) => {
         // Clear storage
         localStorage.removeItem('isAuthenticated');
         localStorage.removeItem('user');
+        localStorage.removeItem('schoolType');
         // Optional: clear academic data if tied to user
+    };
+
+    const toggleSchoolType = (type) => {
+        const newType = type || (schoolType === 'day' ? 'open' : 'day');
+        setSchoolType(newType);
+        localStorage.setItem('schoolType', newType);
     };
 
     useEffect(() => {
@@ -91,10 +102,10 @@ export const AppProvider = ({ children }) => {
             // getUser(); // Disabled because session cookies aren't shared cross-origin
             getAcademic();
         }
-    }, [isAuthenticated]);
+    }, [isAuthenticated, schoolType]);
 
     return (
-        <AppContext.Provider value={{ user, academic, setUser, setAcademic, getUser, getAcademic, isAuthenticated, login, logout }}>
+        <AppContext.Provider value={{ user, academic, schoolType, setUser, setAcademic, getUser, getAcademic, isAuthenticated, login, logout, toggleSchoolType }}>
             {children}
         </AppContext.Provider>
     );

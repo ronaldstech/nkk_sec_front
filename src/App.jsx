@@ -19,10 +19,12 @@ import {
   Person as PersonIcon,
   Settings as SettingsIcon,
   Logout as LogoutIcon,
-  Class as ClassIcon
+  Class as ClassIcon,
+  AssignmentInd as AssignmentIndIcon
 } from '@mui/icons-material';
 import StaffDashboard from './pages/staff_view/StaffDashboard';
 import StaffHome from './pages/staff_view/grading/StaffHome';
+import Workload from './pages/Workload';
 
 // Profile and Logout are shared
 
@@ -161,6 +163,7 @@ const adminMenus = [
   { title: "Dashboard", icon: <HomeIcon />, path: "/" },
   { title: "Staff", icon: <GroupIcon />, path: "/staff" },
   { title: "Students", icon: <GroupIcon />, path: "/students" },
+  { title: "Workload", icon: <AssignmentIndIcon />, path: "/workload" },
   { title: "Academics", icon: <ShoppingBagIcon />, path: "/academics" },
   { title: "Results", icon: <ReceiptIcon />, path: "/results" },
   { title: "Profile", icon: <PersonIcon />, path: "/profile" },
@@ -241,6 +244,7 @@ function App() {
                     <Route path="/dashboard" element={<Navigate to="/" replace />} />
                     <Route path="/staff" element={<StaffAdmin />} />
                     <Route path="/students" element={<StudentsAdmin />} />
+                    <Route path="/workload" element={<Workload />} />
                     <Route path="/academics" element={<Academics />} />
                     <Route path="/results" element={<Results />} />
                     <Route path="/profile" element={<Profile />} />

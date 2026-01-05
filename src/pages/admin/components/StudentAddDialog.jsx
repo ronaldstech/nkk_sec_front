@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useAppContext } from '../../../context/AppContext';
 import {
     Button,
     Dialog,
@@ -23,6 +24,7 @@ import {
 } from '@mui/icons-material';
 
 const StudentAddDialog = ({ open, onClose, onSave }) => {
+    const { schoolType } = useAppContext();
     const [form, setForm] = useState("");
     const [gender, setGender] = useState("");
 
@@ -109,7 +111,20 @@ const StudentAddDialog = ({ open, onClose, onSave }) => {
                             startAdornment: <InputAdornment position="start"><PersonIcon fontSize="small" sx={{ color: '#94a3b8' }} /></InputAdornment>
                         }}
                     />
-                    <input type="hidden" name="school" value="day" />
+                    <TextField
+                        label="School Type"
+                        name="school"
+                        value={schoolType.toUpperCase()}
+                        variant="outlined"
+                        fullWidth
+                        disabled
+                        sx={{ mb: 3 }}
+                        InputProps={{
+                            startAdornment: <InputAdornment position="start"><SchoolIcon fontSize="small" sx={{ color: '#94a3b8' }} /></InputAdornment>
+                        }}
+                    />
+                    {/* Keep hidden actual value for form submission if needed, though disabled fields might not submit in some cases */}
+                    <input type="hidden" name="school" value={schoolType} />
 
                     <FormControl fullWidth sx={{ mb: 3 }}>
                         <InputLabel id="form">Form</InputLabel>

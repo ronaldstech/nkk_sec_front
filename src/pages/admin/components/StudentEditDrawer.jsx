@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useAppContext } from '../../../context/AppContext';
 import {
     Button,
     Box,
@@ -28,6 +29,7 @@ import {
 } from '@mui/icons-material';
 
 const StudentEditDrawer = ({ open, onClose, activeStudent, onUpdate, onActivate }) => {
+    const { schoolType } = useAppContext();
     const [localActive, setLocalActive] = useState({});
 
     useEffect(() => {
@@ -115,7 +117,8 @@ const StudentEditDrawer = ({ open, onClose, activeStudent, onUpdate, onActivate 
 
             <form onSubmit={onUpdate} style={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
                 <Box sx={{ p: 4, flexGrow: 1 }}>
-                    <input type="hidden" name="student_id_edit" value={localActive.id || ''} />
+                    <input type="hidden" name="student_id" value={localActive.id || ''} />
+                    <input type="hidden" name="editStudent" value="true" />
 
                     <Stack spacing={3}>
                         <Box>
@@ -128,7 +131,7 @@ const StudentEditDrawer = ({ open, onClose, activeStudent, onUpdate, onActivate 
 
                             <TextField
                                 label="First Name"
-                                name="fname_edit"
+                                name="first"
                                 value={localActive.first || ''}
                                 onChange={e => { setLocalActive({ ...localActive, first: e.target.value }) }}
                                 variant="outlined"
@@ -138,7 +141,7 @@ const StudentEditDrawer = ({ open, onClose, activeStudent, onUpdate, onActivate 
                             />
                             <TextField
                                 label="Middle Name"
-                                name="mname_edit"
+                                name="middle"
                                 value={localActive.middle || ''}
                                 onChange={e => { setLocalActive({ ...localActive, middle: e.target.value }) }}
                                 variant="outlined"
@@ -148,7 +151,7 @@ const StudentEditDrawer = ({ open, onClose, activeStudent, onUpdate, onActivate 
                             />
                             <TextField
                                 label="Last Name"
-                                name="lname_edit"
+                                name="last"
                                 value={localActive.last || ''}
                                 onChange={e => { setLocalActive({ ...localActive, last: e.target.value }) }}
                                 variant="outlined"
@@ -170,7 +173,7 @@ const StudentEditDrawer = ({ open, onClose, activeStudent, onUpdate, onActivate 
                                 <InputLabel id="form_edit">Form</InputLabel>
                                 <Select
                                     labelId="form_edit"
-                                    name="form_edit"
+                                    name="form"
                                     value={localActive.form || ''}
                                     label="Form"
                                     onChange={e => { setLocalActive({ ...localActive, form: e.target.value }) }}
@@ -184,8 +187,23 @@ const StudentEditDrawer = ({ open, onClose, activeStudent, onUpdate, onActivate 
                             </FormControl>
 
                             <TextField
+                                label="School Type"
+                                name="school"
+                                value={(localActive.school || schoolType).toUpperCase()}
+                                variant="outlined"
+                                size="small"
+                                fullWidth
+                                disabled
+                                sx={{ mb: 2 }}
+                                InputProps={{
+                                    startAdornment: <InputAdornment position="start"><SchoolIcon fontSize="small" /></InputAdornment>,
+                                }}
+                            />
+                            <input type="hidden" name="school" value={localActive.school || schoolType} />
+
+                            <TextField
                                 label="Registration No."
-                                name="reg_edit"
+                                name="student_reg"
                                 value={localActive.student_reg || ''}
                                 onChange={e => { setLocalActive({ ...localActive, student_reg: e.target.value }) }}
                                 variant="outlined"
@@ -210,7 +228,7 @@ const StudentEditDrawer = ({ open, onClose, activeStudent, onUpdate, onActivate 
                                 <InputLabel id="gender_edit">Gender</InputLabel>
                                 <Select
                                     labelId="gender_edit"
-                                    name="gender_edit"
+                                    name="gender"
                                     value={localActive.gender || ''}
                                     label="Gender"
                                     onChange={e => { setLocalActive({ ...localActive, gender: e.target.value }) }}

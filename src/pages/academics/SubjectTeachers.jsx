@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { AppContext } from '../../context/AppContext';
 import {
     Box, Typography, Table, TableHead, TableRow, TableCell,
     TableBody, Stack, Paper, TableContainer, IconButton, Chip, Avatar, Tooltip, LinearProgress,
@@ -16,6 +17,7 @@ import AssignSubjectDialog from './components/AssignSubjectDialog';
 const API_URL = "https://unimarket-mw.com/smis-api/api/index.php";
 
 function SubjectTeachers({ readOnly = false }) {
+    const { schoolType } = useContext(AppContext);
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const [rows, setRows] = useState([]);
@@ -30,7 +32,7 @@ function SubjectTeachers({ readOnly = false }) {
 
     /* ================= DATA FETCHING ================= */
     const getAcademic = async () => {
-        const res = await fetch(`${API_URL}?getAcademic=true`);
+        const res = await fetch(`${API_URL}?getAcademic=true&school_type=${schoolType}`);
         const data = await res.json();
         setAcademic(data);
     };
@@ -39,7 +41,7 @@ function SubjectTeachers({ readOnly = false }) {
         if (!academic.id) return;
         setLoading(true);
         try {
-            const res = await fetch(`${API_URL}?getStaffA=${academic.id}`);
+            const res = await fetch(`${API_URL}?getStaffA=${academic.id}&school_type=${schoolType}`);
             const data = await res.json();
             setRows(data);
         } catch (error) {
@@ -101,8 +103,8 @@ function SubjectTeachers({ readOnly = false }) {
         getSubs();
     };
 
-    useEffect(() => { getAcademic(); }, []);
-    useEffect(() => { getStaff(); }, [academic]);
+    useEffect(() => { getAcademic(); }, [schoolType]);
+    useEffect(() => { getStaff(); }, [academic, schoolType]);
 
     return (
         <Box>

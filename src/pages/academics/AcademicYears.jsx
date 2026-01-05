@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { AppContext } from '../../context/AppContext';
 import {
     Button,
     Dialog,
@@ -38,6 +39,7 @@ import "toastify-js/src/toastify.css";
 const API_URL = "https://unimarket-mw.com/smis-api/api/index.php";
 
 function AcademicYears({ readOnly = false }) {
+    const { schoolType } = useContext(AppContext);
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const [open, setOpen] = useState({
@@ -51,7 +53,7 @@ function AcademicYears({ readOnly = false }) {
     const fetchAcademicYears = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`${API_URL}?getAcademicYears=1`);
+            const res = await fetch(`${API_URL}?getAcademicYears=1&school_type=${schoolType}`);
             const data = await res.json();
             setRows(data);
         } catch (error) {
@@ -123,7 +125,7 @@ function AcademicYears({ readOnly = false }) {
 
     useEffect(() => {
         fetchAcademicYears();
-    }, []);
+    }, [schoolType]);
 
     return (
         <Box>
@@ -160,6 +162,7 @@ function AcademicYears({ readOnly = false }) {
                                 {!isMobile && <TableCell sx={{ fontWeight: 600, color: '#475569' }}>Closing</TableCell>}
                                 {!isMobile && <TableCell sx={{ fontWeight: 600, color: '#475569' }}>Next Term</TableCell>}
                                 {!isMobile && <TableCell sx={{ fontWeight: 600, color: '#475569' }}>Fees</TableCell>}
+                                {!isMobile && <TableCell sx={{ fontWeight: 600, color: '#475569' }}>School</TableCell>}
                                 <TableCell sx={{ fontWeight: 600, color: '#475569' }}>Status</TableCell>
                                 {!readOnly && <TableCell sx={{ fontWeight: 600, color: '#475569' }} align="right">Actions</TableCell>}
                             </TableRow>
@@ -185,6 +188,7 @@ function AcademicYears({ readOnly = false }) {
                                         {!isMobile && <TableCell sx={{ color: '#64748b', fontSize: 13 }}>{row.closing_term}</TableCell>}
                                         {!isMobile && <TableCell sx={{ color: '#64748b', fontSize: 13 }}>{row.next_term_begins}</TableCell>}
                                         {!isMobile && <TableCell>{row.fees}</TableCell>}
+                                        {!isMobile && <TableCell>{row.school}</TableCell>}
                                         <TableCell>
                                             <Chip
                                                 label={row.status}
