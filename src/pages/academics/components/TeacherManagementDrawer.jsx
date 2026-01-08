@@ -55,7 +55,7 @@ function TeacherManagementDrawer({ open, onClose, teacher, subjects, loading, on
                     </Paper>
 
                     <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 700, color: '#475569' }}>
-                        Current Load ({subjects.length})
+                        Current Load ({Array.isArray(subjects) ? subjects.length : 0})
                     </Typography>
 
                     {loading ? (
@@ -64,7 +64,7 @@ function TeacherManagementDrawer({ open, onClose, teacher, subjects, loading, on
                         </Box>
                     ) : (
                         <Stack spacing={1}>
-                            {subjects.map((row, index) => (
+                            {Array.isArray(subjects) && subjects.map((row, index) => (
                                 <Paper key={index} sx={{ p: 1.5, borderRadius: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1px solid #e2e8f0' }}>
                                     <Box>
                                         <Typography variant="body2" fontWeight={700}>{row.subject_data?.name}</Typography>
@@ -79,7 +79,7 @@ function TeacherManagementDrawer({ open, onClose, teacher, subjects, loading, on
                                     </IconButton>
                                 </Paper>
                             ))}
-                            {subjects.length === 0 && (
+                            {(!Array.isArray(subjects) || subjects.length === 0) && (
                                 <Box sx={{ textAlign: 'center', py: 5 }}>
                                     <Typography variant="body2" color="textSecondary">No subjects assigned.</Typography>
                                 </Box>

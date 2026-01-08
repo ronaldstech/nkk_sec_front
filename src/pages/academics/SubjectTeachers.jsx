@@ -43,7 +43,7 @@ function SubjectTeachers({ readOnly = false }) {
         try {
             const res = await fetch(`${API_URL}?getStaffA=${academic.id}&school_type=${schoolType}`);
             const data = await res.json();
-            setRows(data);
+            setRows(Array.isArray(data) ? data : []);
         } catch (error) {
             console.error("Error fetching staff:", error);
         } finally {
@@ -52,19 +52,26 @@ function SubjectTeachers({ readOnly = false }) {
     };
 
     const getSubs = async () => {
-        const res = await fetch(`${API_URL}?getSubs=true`);
-        const data = await res.json();
-        setSubs(data);
+        try {
+            const res = await fetch(`${API_URL}?getSubs=true`);
+            const data = await res.json();
+            setSubs(Array.isArray(data) ? data : []);
+        } catch (error) {
+            console.error("Error fetching subjects:", error);
+            setSubs([]);
+        }
     };
 
     const getSubt = async (teacherId, academicId) => {
+        if (!academicId || !teacherId) return;
         setSubtLoading(true);
         try {
-            const res = await fetch(`${API_URL}?getSubt=true&academic_id=${academicId}&teacher_id=${teacherId}`);
+            const res = await fetch(`${API_URL}?getSubt=true&academic_id=${academicId}&teacher_id=${teacherId}&school_type=${schoolType}`);
             const data = await res.json();
-            setSubt(data);
+            setSubt(Array.isArray(data) ? data : []);
         } catch (error) {
-            console.error("Error fetching teacher subjects:", error);
+            console.error("Error fetching subject teachers:", error);
+            setSubt([]);
         } finally {
             setSubtLoading(false);
         }
@@ -72,16 +79,68 @@ function SubjectTeachers({ readOnly = false }) {
 
     /* ================= ACTIONS ================= */
     const select_subject = async (subj) => {
+        // Validation: ensure all required fields are present
+        if (!manage.id || !subj.id || !form || !academic.id || !schoolType) {
+            console.error("Missing required parameters for subject assignment:", {
+                teacher_id: manage.id,
+                subject_id: subj.id,
+                form: form,
+                academic_id: academic.id,
+                school_type: schoolType
+            });
+            Toastify({
+                text: "Missing assignment data. Please try again.",
+                backgroundColor: "#dc2626"
+            }).showToast();
+            return;
+        }
+
         const body = new URLSearchParams({
-            teacher_id: manage.id, subject_id: subj.id,
-            form: form, academic_id: academic.id
+            assignSubject: "true", // Using string "true" for consistency
+            teacher_id: manage.id.toString(),
+            subject_id: subj.id.toString(),
+            form: form.toString(),
+            academic_id: academic.id.toString(),
+            school_type: schoolType
         });
-        const response = await fetch(API_URL, { method: 'POST', body: body });
-        const res = await response.json();
-        Toastify({ text: res.message, backgroundColor: "#4f46e5" }).showToast();
-        getSubt(manage.id, academic.id);
-        getStaff();
-    }
+
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body,
+                credentials: 'include' // Crucial for session-based auth in PHP
+            });
+
+            const text = await response.text();
+            let res;
+            try {
+                res = JSON.parse(text);
+            } catch (e) {
+                console.error("Server return non-JSON response:", text);
+                throw new Error("Invalid server response");
+            }
+
+            Toastify({
+                text: res.message,
+                backgroundColor: res.status ? "#4f46e5" : "#dc2626"
+            }).showToast();
+
+            if (res.status) {
+                getSubt(manage.id, academic.id);
+                getStaff();
+            }
+        } catch (error) {
+            console.error("Assignment error:", error);
+            Toastify({
+                text: "Failed to connect to server",
+                backgroundColor: "#dc2626"
+            }).showToast();
+        }
+    };
+
 
     const handleDelete = async (id) => {
         const response = await fetch(API_URL, {
@@ -146,7 +205,7 @@ function SubjectTeachers({ readOnly = false }) {
                                 </TableCell>
                             </TableRow>
                         ) : (
-                            rows.map((row, index) => (
+                            Array.isArray(rows) && rows.map((row, index) => (
                                 <TableRow key={index} hover sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                                     <TableCell>
                                         <Stack direction="row" alignItems="center" spacing={2}>

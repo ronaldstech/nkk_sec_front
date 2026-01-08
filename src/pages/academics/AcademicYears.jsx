@@ -102,7 +102,7 @@ function AcademicYears({ readOnly = false }) {
         try {
             const response = await fetch(API_URL, {
                 method: 'POST',
-                body: new URLSearchParams({ academic_id: id, status_edit: status }),
+                body: new URLSearchParams({ academic_id: id, status_edit: status, school: schoolType }),
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
             });
             const res = await response.json();
@@ -269,7 +269,7 @@ function AcademicYears({ readOnly = false }) {
                             <TextField label="Closing Date" name="closing_date" type="date" size="small" fullWidth InputLabelProps={{ shrink: true }} />
                             <TextField label="Next Term Begins" name="next_term_begins_on" type="date" size="small" fullWidth InputLabelProps={{ shrink: true }} />
                         </Stack>
-
+                        <input type="hidden" name="school_type" value={schoolType} />
                         <TextField
                             label="Fees"
                             name="fees"

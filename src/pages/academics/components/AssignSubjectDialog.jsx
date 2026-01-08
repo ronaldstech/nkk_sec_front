@@ -14,7 +14,7 @@ function AssignSubjectDialog({ open, onClose, form, subjects, onSelect, onSave }
     const [searchQuery, setSearchQuery] = useState('');
 
     // Filter subjects based on search
-    const filteredSubjects = subjects.filter(sub =>
+    const filteredSubjects = (Array.isArray(subjects) ? subjects : []).filter(sub =>
         sub.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
