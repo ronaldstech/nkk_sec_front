@@ -25,7 +25,7 @@ const API_URL = "https://unimarket-mw.com/smis-api/api/index.php";
 function StaffHome() {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-    const { user, academic } = useContext(AppContext);
+    const { user, academic, schoolType } = useContext(AppContext);
 
     // State
     const [sub, setSub] = useState([]);
@@ -51,7 +51,8 @@ function StaffHome() {
             const params = new URLSearchParams({
                 getSubt: "true",
                 academic_id: academic.id,
-                teacher_id: user.id
+                teacher_id: user.id,
+                school_type: schoolType
             });
             const res = await fetch(`${API_URL}?${params.toString()}`);
             const data = await res.json();
@@ -115,7 +116,8 @@ function StaffHome() {
                 getYourStudents: "true",
                 form: form,
                 academic_id: aca_id,
-                subject_id: subId
+                subject_id: subId,
+                school_type: schoolType
             });
             const res = await fetch(`${API_URL}?${params.toString()}`);
             const data = await res.json();
