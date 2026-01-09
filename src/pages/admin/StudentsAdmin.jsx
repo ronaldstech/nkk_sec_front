@@ -108,9 +108,11 @@ function StudentsAdmin() {
     /* ===== FETCH DATA ===== */
     const getStudents = async () => {
         setLoading(true);
+        console.log("Fetching Students for schoolType:", schoolType);
         try {
             const res = await fetch(`${API_URL}?getStudents=true&school_type=${schoolType}`);
             const data = await res.json();
+            console.log("Students Data:", data);
             if (Array.isArray(data)) {
                 setRows(data);
             } else {
@@ -137,12 +139,14 @@ function StudentsAdmin() {
         const body = new URLSearchParams(formData);
 
         try {
+            console.log(`Submitting form for action: ${action} with body:`, Object.fromEntries(body));
             const response = await fetch(API_URL, {
                 method: 'POST',
                 body: body,
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             });
             const text = await response.text();
+            console.log("Server Response Text:", text);
             let res;
             try {
                 res = JSON.parse(text);
@@ -173,12 +177,14 @@ function StudentsAdmin() {
     const activate = async (id, status) => {
         try {
             const body = new URLSearchParams({ student_id: id, status_edit: status });
+            console.log("Updating student status with body:", Object.fromEntries(body));
             const response = await fetch(API_URL, {
                 method: 'POST',
                 body: body,
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             });
             const res = await response.json();
+            console.log("Status Update Response:", res);
 
             if (res.status) {
                 Toastify({
@@ -197,12 +203,14 @@ function StudentsAdmin() {
     const deleteStudent = async (id) => {
         try {
             const body = new URLSearchParams({ student_id: id, deleteStudent: true });
+            console.log("Deleting student with body:", Object.fromEntries(body));
             const response = await fetch(API_URL, {
                 method: 'POST',
                 body: body,
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             });
             const res = await response.json();
+            console.log("Delete Student Response:", res);
 
             if (res.status) {
                 Toastify({ text: "Deleted Successfully", backgroundColor: "#64748b" }).showToast();

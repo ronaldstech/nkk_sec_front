@@ -32,17 +32,21 @@ function SubjectTeachers({ readOnly = false }) {
 
     /* ================= DATA FETCHING ================= */
     const getAcademic = async () => {
+        console.log("Fetching Academic Year for schoolType:", schoolType);
         const res = await fetch(`${API_URL}?getAcademic=true&school_type=${schoolType}`);
         const data = await res.json();
+        console.log("Academic Year Data:", data);
         setAcademic(data);
     };
 
     const getStaff = async () => {
         if (!academic.id) return;
         setLoading(true);
+        console.log("Fetching Staff for academicId:", academic.id, "schoolType:", schoolType);
         try {
             const res = await fetch(`${API_URL}?getStaffA=${academic.id}&school_type=${schoolType}`);
             const data = await res.json();
+            console.log("Staff Data:", data);
             setRows(Array.isArray(data) ? data : []);
         } catch (error) {
             console.error("Error fetching staff:", error);
@@ -52,9 +56,11 @@ function SubjectTeachers({ readOnly = false }) {
     };
 
     const getSubs = async () => {
+        console.log("Fetching All Subjects...");
         try {
             const res = await fetch(`${API_URL}?getSubs=true`);
             const data = await res.json();
+            console.log("Subjects Data:", data);
             setSubs(Array.isArray(data) ? data : []);
         } catch (error) {
             console.error("Error fetching subjects:", error);
@@ -65,9 +71,11 @@ function SubjectTeachers({ readOnly = false }) {
     const getSubt = async (teacherId, academicId) => {
         if (!academicId || !teacherId) return;
         setSubtLoading(true);
+        console.log("Fetching Subject Teachers for teacherId:", teacherId, "academicId:", academicId);
         try {
             const res = await fetch(`${API_URL}?getSubt=true&academic_id=${academicId}&teacher_id=${teacherId}&school_type=${schoolType}`);
             const data = await res.json();
+            console.log("Subject Teachers Data:", data);
             setSubt(Array.isArray(data) ? data : []);
         } catch (error) {
             console.error("Error fetching subject teachers:", error);
@@ -105,16 +113,17 @@ function SubjectTeachers({ readOnly = false }) {
         });
 
         try {
+            console.log("Assigning Subject with body:", Object.fromEntries(body));
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
                 body,
-                credentials: 'include' // Crucial for session-based auth in PHP
             });
 
             const text = await response.text();
+            console.log("Server Response Text:", text);
             let res;
             try {
                 res = JSON.parse(text);
@@ -143,11 +152,13 @@ function SubjectTeachers({ readOnly = false }) {
 
 
     const handleDelete = async (id) => {
+        console.log("Deleting Subject Teacher Entry ID:", id);
         const response = await fetch(API_URL, {
             method: 'POST',
             body: new URLSearchParams({ deleteSubt: "true", id: id })
         });
         const res = await response.json();
+        console.log("Delete Response:", res);
         if (res.status) {
             Toastify({ text: res.message, backgroundColor: "#ef4444" }).showToast();
             getSubt(manage.id, academic.id);
@@ -162,8 +173,16 @@ function SubjectTeachers({ readOnly = false }) {
         getSubs();
     };
 
-    useEffect(() => { getAcademic(); }, [schoolType]);
-    useEffect(() => { getStaff(); }, [academic, schoolType]);
+    useEffect(() => {
+        setAcademic({ id: 0, name: "Loading...", term: "" });
+        getAcademic();
+    }, [schoolType]);
+
+    useEffect(() => {
+        if (academic.id && academic.school === schoolType) {
+            getStaff();
+        }
+    }, [academic.id, academic.school, schoolType]);
 
     return (
         <Box>
@@ -236,7 +255,7 @@ function SubjectTeachers({ readOnly = false }) {
                                                 <Box sx={{ width: '100%', mr: 1 }}>
                                                     <LinearProgress
                                                         variant="determinate"
-                                                        value={Math.min((row.subject_count / 8) * 100, 100)}
+                                                        value={Math.min((row.subject_count / 6) * 100, 100)}
                                                         sx={{
                                                             height: 6, borderRadius: 5, bgcolor: '#f1f5f9',
                                                             '& .MuiLinearProgress-bar': { borderRadius: 5, bgcolor: row.subject_count > 6 ? '#f59e0b' : '#6366f1' }
