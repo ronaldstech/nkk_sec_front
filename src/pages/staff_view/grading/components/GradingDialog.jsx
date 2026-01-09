@@ -24,7 +24,8 @@ import {
     Close as CloseIcon,
     School as SchoolIcon,
     Visibility as VisibilityIcon,
-    Search as SearchIcon
+    Search as SearchIcon,
+    DeleteOutline as DeleteIcon
 } from '@mui/icons-material';
 
 const GradingDialog = ({
@@ -36,6 +37,8 @@ const GradingDialog = ({
     rows,
     studentLoading,
     isMobile,
+    schoolType,
+    onDeleteMarkRow,
     onUpdateMark,
     onUpdateAssessment,
     onLocalUpdate
@@ -186,21 +189,31 @@ const GradingDialog = ({
                                             >
                                                 Student Full Names
                                             </TableCell>
+                                            {schoolType !== 'open' && (
+                                                <TableCell
+                                                    sx={{
+                                                        bgcolor: '#f8fafc', fontWeight: 800, color: '#475569',
+                                                        width: { xs: 120, md: 180 }, textAlign: 'center'
+                                                    }}
+                                                >
+                                                    Asses <Typography variant="caption" sx={{ display: 'block', opacity: 0.6 }}>(40%)</Typography>
+                                                </TableCell>
+                                            )}
                                             <TableCell
                                                 sx={{
                                                     bgcolor: '#f8fafc', fontWeight: 800, color: '#475569',
                                                     width: { xs: 120, md: 180 }, textAlign: 'center'
                                                 }}
                                             >
-                                                Asses <Typography variant="caption" sx={{ display: 'block', opacity: 0.6 }}>(40%)</Typography>
+                                                Exam <Typography variant="caption" sx={{ display: 'block', opacity: 0.6 }}>({schoolType === 'open' ? '100%' : '60%'})</Typography>
                                             </TableCell>
                                             <TableCell
                                                 sx={{
                                                     bgcolor: '#f8fafc', fontWeight: 800, color: '#475569',
-                                                    width: { xs: 120, md: 180 }, textAlign: 'center'
+                                                    width: 80, textAlign: 'center'
                                                 }}
                                             >
-                                                Exam <Typography variant="caption" sx={{ display: 'block', opacity: 0.6 }}>(60%)</Typography>
+                                                Actions
                                             </TableCell>
                                         </TableRow>
                                     </TableHead>
@@ -209,12 +222,12 @@ const GradingDialog = ({
                                         {studentLoading ? (
                                             Array.from({ length: 8 }).map((_, i) => (
                                                 <TableRow key={i}>
-                                                    <TableCell colSpan={4} sx={{ py: 3 }}><LinearProgress sx={{ opacity: 0.1, borderRadius: 2 }} /></TableCell>
+                                                    <TableCell colSpan={schoolType === 'open' ? 4 : 5} sx={{ py: 3 }}><LinearProgress sx={{ opacity: 0.1, borderRadius: 2 }} /></TableCell>
                                                 </TableRow>
                                             ))
                                         ) : filteredRows.length === 0 ? (
                                             <TableRow>
-                                                <TableCell colSpan={4} align="center" sx={{ py: 10 }}>
+                                                <TableCell colSpan={schoolType === 'open' ? 4 : 5} align="center" sx={{ py: 10 }}>
                                                     <Box sx={{ opacity: 0.4 }}>
                                                         <VisibilityIcon sx={{ fontSize: 60, mb: 2 }} />
                                                         <Typography fontWeight={700}>No Student Data</Typography>
@@ -244,35 +257,37 @@ const GradingDialog = ({
                                                             {row.last.toUpperCase() + " " + row.first.toUpperCase() || "Unknown Student"}
                                                         </Typography>
                                                     </TableCell>
-                                                    <TableCell>
-                                                        <TextField
-                                                            size="small"
-                                                            type="number"
-                                                            variant="outlined"
-                                                            value={row.assessment || ""}
-                                                            onChange={e => onLocalUpdate(row.id, 'assessment', e.target.value)}
-                                                            onBlur={e => onUpdateAssessment(row.id, acaData.subject_id, acaData.form, acaData.academic_id, e.target.value)}
-                                                            InputProps={{
-                                                                endAdornment: <InputAdornment position="end" sx={{ '& .MuiTypography-root': { fontSize: 12, fontWeight: 700, opacity: 0.5 } }}>%</InputAdornment>,
-                                                                sx: {
-                                                                    borderRadius: '10px',
-                                                                    fontWeight: 800,
-                                                                    color: '#6366f1',
-                                                                    '& input': { textAlign: 'center' },
-                                                                    bgcolor: '#fcfdff'
-                                                                }
-                                                            }}
-                                                            sx={{
-                                                                maxWidth: 140, mx: 'auto',
-                                                                '& .MuiOutlinedInput-root': {
-                                                                    '& fieldset': { borderColor: 'rgba(99, 102, 241, 0.1)' },
-                                                                    '&:hover fieldset': { borderColor: '#6366f1' },
-                                                                    '&.Mui-focused fieldset': { borderColor: '#6366f1' }
-                                                                }
-                                                            }}
-                                                        />
-                                                    </TableCell>
-                                                    <TableCell>
+                                                    {schoolType !== 'open' && (
+                                                        <TableCell sx={{ textAlign: 'center' }}>
+                                                            <TextField
+                                                                size="small"
+                                                                type="number"
+                                                                variant="outlined"
+                                                                value={row.assessment || ""}
+                                                                onChange={e => onLocalUpdate(row.id, 'assessment', e.target.value)}
+                                                                onBlur={e => onUpdateAssessment(row.id, acaData.subject_id, acaData.form, acaData.academic_id, e.target.value)}
+                                                                InputProps={{
+                                                                    endAdornment: <InputAdornment position="end" sx={{ '& .MuiTypography-root': { fontSize: 12, fontWeight: 700, opacity: 0.5 } }}>%</InputAdornment>,
+                                                                    sx: {
+                                                                        borderRadius: '10px',
+                                                                        fontWeight: 800,
+                                                                        color: '#6366f1',
+                                                                        '& input': { textAlign: 'center' },
+                                                                        bgcolor: '#fcfdff'
+                                                                    }
+                                                                }}
+                                                                sx={{
+                                                                    maxWidth: 100,
+                                                                    '& .MuiOutlinedInput-root': {
+                                                                        '& fieldset': { borderColor: 'rgba(99, 102, 241, 0.1)' },
+                                                                        '&:hover fieldset': { borderColor: '#6366f1' },
+                                                                        '&.Mui-focused fieldset': { borderColor: '#6366f1' }
+                                                                    }
+                                                                }}
+                                                            />
+                                                        </TableCell>
+                                                    )}
+                                                    <TableCell sx={{ textAlign: 'center' }}>
                                                         <TextField
                                                             size="small"
                                                             type="number"
@@ -291,7 +306,7 @@ const GradingDialog = ({
                                                                 }
                                                             }}
                                                             sx={{
-                                                                maxWidth: 140, mx: 'auto',
+                                                                maxWidth: 100,
                                                                 '& .MuiOutlinedInput-root': {
                                                                     '& fieldset': { borderColor: 'rgba(16, 185, 129, 0.1)' },
                                                                     '&:hover fieldset': { borderColor: '#10b981' },
@@ -299,6 +314,21 @@ const GradingDialog = ({
                                                                 }
                                                             }}
                                                         />
+                                                    </TableCell>
+                                                    <TableCell sx={{ textAlign: 'center' }}>
+                                                        <IconButton
+                                                            size="small"
+                                                            color="error"
+                                                            sx={{
+                                                                opacity: (row.assessment || row.end_term) ? 0.8 : 0.2,
+                                                                '&:hover': { opacity: 1, bgcolor: '#fee2e2' },
+                                                                transition: 'all 0.2s'
+                                                            }}
+                                                            onClick={() => onDeleteMarkRow(row.id, acaData.subject_id, acaData.form, acaData.academic_id)}
+                                                            disabled={!(row.assessment || row.end_term)}
+                                                        >
+                                                            <DeleteIcon fontSize="small" />
+                                                        </IconButton>
                                                     </TableCell>
                                                 </TableRow>
                                             ))

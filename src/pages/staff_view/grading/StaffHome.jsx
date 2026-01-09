@@ -38,7 +38,7 @@ function StaffHome() {
 
     // Derived State
     const gradedCount = rows.filter(r =>
-        r.assessment !== "" || r.end_term !== ""
+        (schoolType === 'open' ? false : r.assessment !== "") || r.end_term !== ""
     ).length;
 
     const progress = rows.length > 0 ? Math.round((gradedCount / rows.length) * 100) : 0;
@@ -72,7 +72,9 @@ function StaffHome() {
                     const studentData = await studentRes.json();
                     const students = Array.isArray(studentData) ? studentData : [];
 
-                    const gradedCount = students.filter(r => r.mark?.assessments || r.mark?.end_term).length;
+                    const gradedCount = students.filter(r =>
+                        (schoolType === 'open' ? false : r.mark?.assessments) || r.mark?.end_term
+                    ).length;
                     const totalStudents = students.length || 1; // avoid division by 0
                     const progress = Math.round((gradedCount / totalStudents) * 100);
 
@@ -159,7 +161,8 @@ function StaffHome() {
 
         try {
             const body = new URLSearchParams({
-                updateEndTerm: "true", id, subject, form, academic_id, value
+                updateEndTerm: "true", id, subject, form, academic_id, value,
+                school_type: schoolType
             });
             const response = await fetch(API_URL, {
                 method: 'POST',
@@ -187,7 +190,8 @@ function StaffHome() {
 
         try {
             const body = new URLSearchParams({
-                updateAssessment: "true", id, subject, form, academic_id, value
+                updateAssessment: "true", id, subject, form, academic_id, value,
+                school_type: schoolType
             });
             const response = await fetch(API_URL, {
                 method: 'POST',
@@ -203,6 +207,33 @@ function StaffHome() {
         } catch (error) {
             console.error("Error updating assessment:", error);
             Toastify({ text: "Update failed", backgroundColor: "#ef4444" }).showToast();
+        }
+    };
+
+    const deleteMarkRow = async (id, subject, form, academic_id) => {
+        if (!window.confirm("Are you sure you want to delete ALL marks for this student record? This cannot be undone.")) return;
+
+        try {
+            const body = new URLSearchParams({
+                deleteMarkRow: "true", id, subject, form, academic_id,
+                school_type: schoolType
+            });
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                body: body,
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+            });
+            const res = await response.json();
+            if (res.status) {
+                Toastify({ text: res.message, backgroundColor: "#64748b", duration: 1500 }).showToast();
+                // Clear both fields locally
+                setRows(prev => prev.map(row => row.id === id ? { ...row, assessment: "", end_term: "" } : row));
+            } else {
+                Toastify({ text: res.message, backgroundColor: "#ef4444" }).showToast();
+            }
+        } catch (error) {
+            console.error("Error deleting mark record:", error);
+            Toastify({ text: "Action failed", backgroundColor: "#ef4444" }).showToast();
         }
     };
 
@@ -267,8 +298,10 @@ function StaffHome() {
                     rows={rows}
                     studentLoading={studentLoading}
                     isMobile={isMobile}
+                    schoolType={schoolType}
                     onUpdateMark={updateMark}
                     onUpdateAssessment={updateAssessment}
+                    onDeleteMarkRow={deleteMarkRow}
                     onLocalUpdate={handleLocalRowUpdate}
                 />
             </Box>
