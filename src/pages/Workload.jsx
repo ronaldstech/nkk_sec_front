@@ -338,7 +338,7 @@ function Workload() {
                     elevation={0}
                     sx={{
                         p: 0,
-                        borderRadius: 4,
+                        borderRadius: 2,
                         border: '1px solid #e2e8f0',
                         bgcolor: '#fff',
                         overflow: 'hidden'
