@@ -146,7 +146,8 @@ function StaffHome() {
             print_marks: "true",
             form: form,
             academic_id: aca_id,
-            subject_id: subId
+            subject_id: subId,
+            school_type: schoolType
         });
         const url = `${API_URL}?${params.toString()}`;
         window.open(url, "_blank").focus();
